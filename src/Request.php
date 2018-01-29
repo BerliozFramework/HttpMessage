@@ -18,6 +18,16 @@ use Psr\Http\Message\UriInterface;
 
 class Request extends Message implements RequestInterface
 {
+    // HTTP methods
+    const HTTP_METHOD_UNKNOWN = 'UNKNOWN';
+    const HTTP_METHOD_GET = 'GET';
+    const HTTP_METHOD_HEAD = 'HEAD';
+    const HTTP_METHOD_POST = 'POST';
+    const HTTP_METHOD_OPTIONS = 'OPTIONS';
+    const HTTP_METHOD_CONNECT = 'CONNECT';
+    const HTTP_METHOD_TRACE = 'TRACE';
+    const HTTP_METHOD_PUT = 'PUT';
+    const HTTP_METHOD_DELETE = 'DELETE';
     /** @var string Method */
     protected $method;
     /** @var \Psr\Http\Message\UriInterface Uri */
