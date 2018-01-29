@@ -1,2 +1,1 @@
-# HttpMessage
-Berlioz HTTP Message
+# Berlioz HTTP Message
