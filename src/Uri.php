@@ -76,7 +76,7 @@ class Uri implements UriInterface
                         $parsedUrl['query'] ?? '',
                         $parsedUrl['fragment'] ?? '',
                         $parsedUrl['user'] ?? '',
-                        $parsedUrl['password'] ?? '');
+                        $parsedUrl['pass'] ?? '');
     }
 
     /**
@@ -195,7 +195,7 @@ class Uri implements UriInterface
      */
     public function getPort()
     {
-        switch ($this->getScheme()) {
+        switch (mb_strtolower($this->getScheme())) {
             case 'http':
                 if ($this->port != 80) {
                     return $this->port;
