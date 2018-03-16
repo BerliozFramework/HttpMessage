@@ -176,11 +176,42 @@ abstract class Message implements MessageInterface
      */
     public function withHeader($name, $value)
     {
+        return $this->withHeaders([$name => $value]);
+    }
+
+    /**
+     * Return an instance with the provided value replacing the specified headers.
+     *
+     * While header names are case-insensitive, the casing of the header will
+     * be preserved by this function, and returned from getHeaders().
+     *
+     * @param string[] $headers Headers.
+     *
+     * @return static
+     */
+    public function withHeaders(array $headers)
+    {
         $clone = clone $this;
-        $name = mb_convert_case($name, MB_CASE_TITLE);
-        $clone->headers[$name] = (array) $value;
+        $clone->setHeaders($headers);
 
         return $clone;
+    }
+
+    /**
+     * Set headers.
+     *
+     * @param string[] $headers Headers.
+     *
+     * @return static
+     */
+    protected function setHeaders(array $headers): MessageInterface
+    {
+        foreach ($headers as $name => $value) {
+            $name = mb_convert_case($name, MB_CASE_TITLE);
+            $this->headers[$name] = (array) $value;
+        }
+
+        return $this;
     }
 
     /**

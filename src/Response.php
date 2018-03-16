@@ -178,10 +178,7 @@ class Response extends Message implements ResponseInterface
         $this->reasonPhrase = $reasonPhrase;
 
         $this->headers = [];
-        foreach ($headers as $name => $value) {
-            $name = mb_convert_case($name, MB_CASE_TITLE);
-            $this->headers[$name] = (array) $value;
-        }
+        $this->setHeaders($headers);
     }
 
     /**
