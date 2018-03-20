@@ -30,7 +30,7 @@ class MessageFactory implements \Http\Message\MessageFactory
         $request = new Request($method, (new UriFactory)->createUri($uri));
 
         // Headers ?
-        if (empty($headers)) {
+        if (!empty($headers)) {
             $request = $request->withHeaders($headers);
         }
 
