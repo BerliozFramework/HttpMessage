@@ -416,24 +416,29 @@ class Uri implements UriInterface
     }
 
     /**
-     * Return an instance with the specified query string.
+     * Return an instance with the specified query.
      *
      * This method MUST retain the state of the current instance, and return
-     * an instance that contains the specified query string.
+     * an instance that contains the specified query.
      *
      * Users can provide both encoded and decoded query characters.
      * Implementations ensure the correct encoding as outlined in getQuery().
      *
-     * An empty query string value is equivalent to removing the query string.
+     * An empty query value is equivalent to removing the query string.
      *
-     * @param string $query The query string to use with the new instance.
+     * @param string|array $query The query to use with the new instance.
      *
-     * @return static A new instance with the specified query string.
-     * @throws \InvalidArgumentException for invalid query strings.
+     * @return static A new instance with the specified query.
+     * @throws \InvalidArgumentException for invalid query.
      */
     public function withQuery($query)
     {
         $clone = clone $this;
+
+        if (is_array($query)) {
+            $query = http_build_query($query);
+        }
+
         $clone->query = $query;
 
         return $clone;
