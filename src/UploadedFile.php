@@ -167,6 +167,24 @@ class UploadedFile implements UploadedFileInterface
     }
 
     /**
+     * Set stream of uploaded file.
+     *
+     * @param \Psr\Http\Message\StreamInterface $stream
+     *
+     * @return \Berlioz\Http\Message\UploadedFile
+     */
+    public function setStream(StreamInterface $stream): UploadedFile
+    {
+        if ($this->hasMoved()) {
+            throw new \RuntimeException(sprintf('Uploaded file "%s" has already moved', $this->file));
+        }
+
+        $this->stream = $stream;
+
+        return $this;
+    }
+
+    /**
      * Move the uploaded file to a new location.
      *
      * Use this method as an alternative to move_uploaded_file(). This method is

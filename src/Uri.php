@@ -12,7 +12,6 @@
 
 namespace Berlioz\Http\Message;
 
-
 use Psr\Http\Message\UriInterface;
 
 class Uri implements UriInterface

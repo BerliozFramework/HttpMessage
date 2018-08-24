@@ -315,39 +315,41 @@ abstract class Message implements MessageInterface
      */
     public function getParsedBody()
     {
-        $contentType = $this->getHeader('Content-Type');
+        if (is_null($this->parsedBody)) {
+            $contentType = $this->getHeader('Content-Type');
 
-        if (!empty($contentType)) {
-            $contentType = explode(';', reset($contentType));
-            $contentType = $contentType[0];
-            $contentType = explode('/', $contentType, 2);
-            $contentType[1] = explode('+', $contentType[1]);
-            $contentType = $contentType[0] . '/' . $contentType[1][count($contentType[1]) - 1];
+            if (!empty($contentType)) {
+                $contentType = explode(';', reset($contentType));
+                $contentType = $contentType[0];
+                $contentType = explode('/', $contentType, 2);
+                $contentType[1] = explode('+', $contentType[1]);
+                $contentType = $contentType[0] . '/' . $contentType[1][count($contentType[1]) - 1];
 
-            if (isset(self::$bodyParser[$contentType]) && is_callable(self::$bodyParser[$contentType])) {
-                $bodyParser = self::$bodyParser[$contentType];
-                $parsedBody = $bodyParser((string) $this->getBody());
-            } else {
-                switch ($contentType) {
-                    case 'application/x-www-form-urlencoded':
-                        $parsedBody = [];
-                        parse_str((string) $this->getBody(), $parsedBody);
-                        break;
-                    case 'multipart/form-data':
-                        $parsedBody = $_POST;
-                        break;
-                    case 'application/json':
-                        $parsedBody = json_decode((string) $this->getBody());
-                        break;
-                    default:
-                        $parsedBody = null;
+                if (isset(self::$bodyParser[$contentType]) && is_callable(self::$bodyParser[$contentType])) {
+                    $bodyParser = self::$bodyParser[$contentType];
+                    $parsedBody = $bodyParser((string) $this->getBody());
+                } else {
+                    switch ($contentType) {
+                        case 'application/x-www-form-urlencoded':
+                            $parsedBody = [];
+                            parse_str((string) $this->getBody(), $parsedBody);
+                            break;
+                        case 'multipart/form-data':
+                            $parsedBody = $_POST;
+                            break;
+                        case 'application/json':
+                            $parsedBody = json_decode((string) $this->getBody());
+                            break;
+                        default:
+                            $parsedBody = null;
+                    }
                 }
-            }
 
-            if (!is_null($parsedBody) && !is_array($parsedBody) && !is_object($parsedBody)) {
-                throw new \RuntimeException('Parsed body must be an array or an object or must be null.');
-            } else {
-                $this->parsedBody = $parsedBody;
+                if (!is_null($parsedBody) && !is_array($parsedBody) && !is_object($parsedBody)) {
+                    throw new \RuntimeException('Parsed body must be an array or an object or must be null.');
+                } else {
+                    $this->parsedBody = $parsedBody;
+                }
             }
         }
 
