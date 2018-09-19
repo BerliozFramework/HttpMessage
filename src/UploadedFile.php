@@ -5,7 +5,8 @@
  * @license   https://opensource.org/licenses/MIT MIT License
  * @copyright 2017 Ronan GIRON
  * @author    Ronan GIRON <https://github.com/ElGigi>
- *
+ * @author    Yohann Lorant <https://github.com/ylorant>
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code, to the root.
  */
@@ -44,41 +45,6 @@ class UploadedFile implements UploadedFileInterface
      */
     public static function parseUploadedFiles(array $uploadedFiles): array
     {
-        $normalized = [];
-
-        // Put value in good depth
-        if (!function_exists(__NAMESPACE__ . '\normalize')) {
-            function normalize($arr, $key)
-            {
-                $ret = [];
-                foreach ($arr as $k => $v) {
-                    if (is_array($v)) {
-                        $ret[$k] = normalize($v, $key);
-                    } else {
-                        $ret[$k][$key] = $v;
-                    }
-                }
-
-                return $ret;
-            }
-        }
-
-        foreach ($uploadedFiles as $name => $values) {
-            if (!isset($normalized[$name])) {
-                $normalized[$name] = [];
-            }
-
-            if (!is_array($values['error'])) {
-                $normalized[$name] = $values;
-            } else {
-                foreach ($values as $attribute_key => $attribute_values) {
-                    $normalized[$name] = array_merge_recursive($normalized[$name],
-                                                               normalize($attribute_values, $attribute_key));
-                }
-            }
-        }
-
-        // Create uploaded file object
         if (!function_exists(__NAMESPACE__ . '\createUploadedFileObj')) {
             function createUploadedFileObj($array)
             {
@@ -101,11 +67,72 @@ class UploadedFile implements UploadedFileInterface
         }
 
         // Result
+        $normalized = self::sanitizeFileData($uploadedFiles);
         $result = createUploadedFileObj($normalized);
         if (is_array($result)) {
             return $result;
         } else {
             return [];
+        }
+    }
+
+    /**
+     * Sanitizes the data from $_FILES and returns them as a proper form-input style value, with recursive support.
+     *
+     * @param array $files The $_FILES array to sanitize.
+     * @return void
+     * 
+     * @author Bart Kelsey <http://www.opengameart.org>
+     * @see https://stackoverflow.com/questions/5444827/how-do-you-loop-through-files-array/29664753#29664753
+     */
+    public static function sanitizeFileData($files) {
+        $result = [];
+
+        foreach($files as $field => $data) {
+            foreach($data as $key => $val) {
+                $result[$field] = [];
+                if(!is_array($val)) {
+                    $result[$field] = $data;
+                } else {
+                    $res = [];
+                    self::filesFlip($res, [], $data);
+                    $result[$field] += $res;
+                }
+            }
+        }
+        
+        return $result;
+    }
+
+    /**
+     * Flips the file's array keys.
+     *
+     * @param array $result
+     * @param array $keys
+     * @param mixed $value
+     * @return void
+     * 
+     * @author Bart Kelsey <http://www.opengameart.org>
+     * @see https://stackoverflow.com/questions/5444827/how-do-you-loop-through-files-array/29664753#29664753
+     */
+    public static function filesFlip(&$result, $keys, $value) {
+        if(is_array($value)) {
+            foreach($value as $k => $v) {
+                $newkeys = $keys;
+                array_push($newkeys, $k);
+                self::filesFlip($result, $newkeys, $v);
+            }
+        } else {
+            $res = $value;
+            // Move the innermost key to the outer spot
+            $first = array_shift($keys);
+            array_push($keys, $first);
+            foreach(array_reverse($keys) as $k) {
+                // You might think we'd say $res[$k] = $res, but $res starts out not as an array
+                $res = [$k => $res];     
+            }
+            
+            $result = array_replace_recursive($result, $res);
         }
     }
 
