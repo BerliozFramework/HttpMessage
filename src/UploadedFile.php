@@ -89,7 +89,7 @@ class UploadedFile implements UploadedFileInterface
         $result = [];
 
         foreach($files as $field => $data) {
-            foreach($data as $key => $val) {
+            foreach($data as $val) {
                 $result[$field] = [];
                 if(!is_array($val)) {
                     $result[$field] = $data;
