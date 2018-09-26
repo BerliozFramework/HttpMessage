@@ -40,8 +40,6 @@ class UploadedFile implements UploadedFileInterface
      * @param array $uploadedFiles $_FILES value
      *
      * @return array Multi dimensional \Berlioz\Http\Message\UploadedFile array
-     *
-     * @todo Refactoring ?!
      */
     public static function parseUploadedFiles(array $uploadedFiles): array
     {
@@ -80,6 +78,7 @@ class UploadedFile implements UploadedFileInterface
      * Sanitizes the data from $_FILES and returns them as a proper form-input style value, with recursive support.
      *
      * @param array $files The $_FILES array to sanitize.
+     *
      * @return void
      * 
      * @author Bart Kelsey <http://www.opengameart.org>
@@ -110,8 +109,9 @@ class UploadedFile implements UploadedFileInterface
      * @param array $result
      * @param array $keys
      * @param mixed $value
+     *
      * @return void
-     * 
+     *
      * @author Bart Kelsey <http://www.opengameart.org>
      * @see https://stackoverflow.com/questions/5444827/how-do-you-loop-through-files-array/29664753#29664753
      */
