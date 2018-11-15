@@ -10,8 +10,9 @@
  * file that was distributed with this source code, to the root.
  */
 
-namespace Berlioz\Http\Message;
+declare(strict_types=1);
 
+namespace Berlioz\Http\Message;
 
 use Psr\Http\Message\MessageInterface;
 use Psr\Http\Message\StreamInterface;
