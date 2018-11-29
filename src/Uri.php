@@ -176,7 +176,11 @@ class Uri implements UriInterface
      */
     public function getHost()
     {
-        return mb_strtolower($this->host) ?? '';
+        if (empty($this->host)) {
+            return '';
+        }
+
+        return mb_strtolower($this->host);
     }
 
     /**
