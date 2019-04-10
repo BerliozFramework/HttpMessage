@@ -6,7 +6,7 @@
  * @copyright 2017 Ronan GIRON
  * @author    Ronan GIRON <https://github.com/ElGigi>
  * @author    Yohann Lorant <https://github.com/ylorant>
- * 
+ *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code, to the root.
  */
@@ -52,13 +52,18 @@ class UploadedFile implements UploadedFileInterface
                 foreach ($array as $key => $value) {
                     if (is_array($value)) {
                         $result[$key] = createUploadedFileObj($value);
-                    } else {
-                        return new UploadedFile($array['tmp_name'],
-                                                $array['name'] ?: '',
-                                                $array['type'] ?: '',
-                                                $array['size'] ?: 0,
-                                                $array['error'] ?: 0);
+                        continue;
                     }
+
+                    if ($array['error'] && $array['error'] == 4) {
+                        continue;
+                    }
+
+                    return new UploadedFile($array['tmp_name'],
+                                            $array['name'] ?: '',
+                                            $array['type'] ?: '',
+                                            $array['size'] ?: 0,
+                                            $array['error'] ?: 0);
                 }
 
                 return $result;
@@ -70,9 +75,9 @@ class UploadedFile implements UploadedFileInterface
         $result = createUploadedFileObj($normalized);
         if (is_array($result)) {
             return $result;
-        } else {
-            return [];
         }
+
+        return [];
     }
 
     /**
@@ -80,18 +85,19 @@ class UploadedFile implements UploadedFileInterface
      *
      * @param array $files The $_FILES array to sanitize.
      *
-     * @return void
-     * 
+     * @return array
+     *
      * @author Bart Kelsey <http://www.opengameart.org>
-     * @see https://stackoverflow.com/questions/5444827/how-do-you-loop-through-files-array/29664753#29664753
+     * @see    https://stackoverflow.com/questions/5444827/how-do-you-loop-through-files-array/29664753#29664753
      */
-    public static function sanitizeFileData($files) {
+    public static function sanitizeFileData($files)
+    {
         $result = [];
 
-        foreach($files as $field => $data) {
-            foreach($data as $val) {
+        foreach ($files as $field => $data) {
+            foreach ($data as $val) {
                 $result[$field] = [];
-                if(!is_array($val)) {
+                if (!is_array($val)) {
                     $result[$field] = $data;
                 } else {
                     $res = [];
@@ -100,7 +106,7 @@ class UploadedFile implements UploadedFileInterface
                 }
             }
         }
-        
+
         return $result;
     }
 
@@ -114,25 +120,26 @@ class UploadedFile implements UploadedFileInterface
      * @return void
      *
      * @author Bart Kelsey <http://www.opengameart.org>
-     * @see https://stackoverflow.com/questions/5444827/how-do-you-loop-through-files-array/29664753#29664753
+     * @see    https://stackoverflow.com/questions/5444827/how-do-you-loop-through-files-array/29664753#29664753
      */
-    public static function filesFlip(&$result, $keys, $value) {
-        if(is_array($value)) {
-            foreach($value as $k => $v) {
-                $newkeys = $keys;
-                array_push($newkeys, $k);
-                self::filesFlip($result, $newkeys, $v);
+    public static function filesFlip(&$result, $keys, $value)
+    {
+        if (is_array($value)) {
+            foreach ($value as $k => $v) {
+                $newKeys = $keys;
+                array_push($newKeys, $k);
+                self::filesFlip($result, $newKeys, $v);
             }
         } else {
             $res = $value;
             // Move the innermost key to the outer spot
             $first = array_shift($keys);
             array_push($keys, $first);
-            foreach(array_reverse($keys) as $k) {
+            foreach (array_reverse($keys) as $k) {
                 // You might think we'd say $res[$k] = $res, but $res starts out not as an array
-                $res = [$k => $res];     
+                $res = [$k => $res];
             }
-            
+
             $result = array_replace_recursive($result, $res);
         }
     }
