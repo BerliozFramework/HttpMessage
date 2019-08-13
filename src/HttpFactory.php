@@ -55,7 +55,11 @@ class HttpFactory implements RequestFactoryInterface,
                                   $body = null,
                                   $protocolVersion = '1.1'): RequestInterface
     {
-        $request = new Request($method, $this->createUri($uri));
+        if (is_string($uri)) {
+            $uri = $this->createUri($uri);
+        }
+
+        $request = new Request($method, $uri);
 
         // Headers ?
         if (!empty($headers)) {
@@ -154,7 +158,7 @@ class HttpFactory implements RequestFactoryInterface,
     public function createServerRequest(string $method, $uri, array $serverParams = []): ServerRequestInterface
     {
         if (is_string($uri)) {
-            $uri = Uri::createFromString($uri);
+            $uri = $this->createUri($uri);
         }
 
         return new ServerRequest($method, $uri, [], [], $serverParams, new Stream());
@@ -285,7 +289,7 @@ class HttpFactory implements RequestFactoryInterface,
     public function createUri(string $uri = ''): UriInterface
     {
         if (is_string($uri)) {
-            return Uri::createFromString($uri);
+            return $this->createUri($uri);
         } else {
             throw new \InvalidArgumentException('Not valid URI given');
         }
