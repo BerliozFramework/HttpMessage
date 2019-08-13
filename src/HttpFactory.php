@@ -28,11 +28,11 @@ use Psr\Http\Message\UriFactoryInterface;
 use Psr\Http\Message\UriInterface;
 
 class HttpFactory implements RequestFactoryInterface,
-                             ResponseFactoryInterface,
-                             ServerRequestFactoryInterface,
-                             StreamFactoryInterface,
-                             UploadedFileFactoryInterface,
-                             UriFactoryInterface
+    ResponseFactoryInterface,
+    ServerRequestFactoryInterface,
+    StreamFactoryInterface,
+    UploadedFileFactoryInterface,
+    UriFactoryInterface
 {
     ///////////////////////////////
     /// RequestFactoryInterface ///
@@ -41,20 +41,21 @@ class HttpFactory implements RequestFactoryInterface,
     /**
      * Create a new request.
      *
-     * @param string                               $method The HTTP method associated with the request.
-     * @param UriInterface|string                  $uri    The URI associated with the request.
-     * @param array                                $headers
+     * @param string $method The HTTP method associated with the request.
+     * @param UriInterface|string $uri The URI associated with the request.
+     * @param array $headers
      * @param resource|string|StreamInterface|null $body
-     * @param string                               $protocolVersion
+     * @param string $protocolVersion
      *
      * @return \Psr\Http\Message\RequestInterface
      */
-    public function createRequest(string $method,
-                                  $uri,
-                                  array $headers = [],
-                                  $body = null,
-                                  $protocolVersion = '1.1'): RequestInterface
-    {
+    public function createRequest(
+        string $method,
+        $uri,
+        array $headers = [],
+        $body = null,
+        $protocolVersion = '1.1'
+    ): RequestInterface {
         if (is_string($uri)) {
             $uri = $this->createUri($uri);
         }
@@ -96,23 +97,24 @@ class HttpFactory implements RequestFactoryInterface,
     /**
      * Create a new response.
      *
-     * @param int                                  $code         The HTTP status code. Defaults to 200.
-     * @param string                               $reasonPhrase The reason phrase to associate with the status code in
+     * @param int $code The HTTP status code. Defaults to 200.
+     * @param string $reasonPhrase The reason phrase to associate with the status code in
      *                                                           the generated response. If none is provided,
      *                                                           implementations MAY use the defaults as suggested in
      *                                                           the HTTP specification.
-     * @param array                                $headers
+     * @param array $headers
      * @param resource|string|StreamInterface|null $body
-     * @param string                               $protocolVersion
+     * @param string $protocolVersion
      *
      * @return \Psr\Http\Message\ResponseInterface
      */
-    public function createResponse(int $code = 200,
-                                   string $reasonPhrase = null,
-                                   array $headers = [],
-                                   $body = null,
-                                   $protocolVersion = '1.1'): ResponseInterface
-    {
+    public function createResponse(
+        int $code = 200,
+        string $reasonPhrase = null,
+        array $headers = [],
+        $body = null,
+        $protocolVersion = '1.1'
+    ): ResponseInterface {
         $stream = null;
         if (!is_null($body)) {
             if (is_resource($body)) {
@@ -124,10 +126,12 @@ class HttpFactory implements RequestFactoryInterface,
             }
         }
 
-        $response = new Response($stream,
-                                 $code,
-                                 $headers,
-                                 $reasonPhrase);
+        $response = new Response(
+            $stream,
+            $code,
+            $headers,
+            $reasonPhrase
+        );
 
         // Protocol version ?
         if ($protocolVersion != $response->getProtocolVersion()) {
@@ -148,9 +152,9 @@ class HttpFactory implements RequestFactoryInterface,
      * of the given values is performed. In particular, no attempt is made to
      * determine the HTTP method or URI, which must be provided explicitly.
      *
-     * @param string              $method       The HTTP method associated with the request.
-     * @param UriInterface|string $uri          The URI associated with the request.
-     * @param array               $serverParams An array of Server API (SAPI) parameters with
+     * @param string $method The HTTP method associated with the request.
+     * @param UriInterface|string $uri The URI associated with the request.
+     * @param array $serverParams An array of Server API (SAPI) parameters with
      *                                          which to seed the generated request instance.
      *
      * @return \Psr\Http\Message\ServerRequestInterface
@@ -194,7 +198,7 @@ class HttpFactory implements RequestFactoryInterface,
      * The `$filename` MAY be any string supported by `fopen()`.
      *
      * @param string $filename The filename or stream URI to use as basis of stream.
-     * @param string $mode     The mode with which to open the underlying filename/stream.
+     * @param string $mode The mode with which to open the underlying filename/stream.
      *
      * @return \Psr\Http\Message\StreamInterface
      * @throws \RuntimeException If the file cannot be opened.
@@ -245,13 +249,13 @@ class HttpFactory implements RequestFactoryInterface,
      * @link http://php.net/manual/features.file-upload.post-method.php
      * @link http://php.net/manual/features.file-upload.errors.php
      *
-     * @param StreamInterface $stream          The underlying stream representing the
+     * @param StreamInterface $stream The underlying stream representing the
      *                                         uploaded file content.
-     * @param int             $size            The size of the file in bytes.
-     * @param int             $error           The PHP file upload error.
-     * @param string          $clientFilename  The filename as provided by the client, if any.
-     * @param string          $clientMediaType The media type as provided by the client, if any.
-     * @param string          $filename        Filename
+     * @param int $size The size of the file in bytes.
+     * @param int $error The PHP file upload error.
+     * @param string $clientFilename The filename as provided by the client, if any.
+     * @param string $clientMediaType The media type as provided by the client, if any.
+     * @param string $filename Filename
      *
      * @return \Psr\Http\Message\UploadedFileInterface
      * @throws \InvalidArgumentException If the file resource is not readable.
@@ -289,7 +293,7 @@ class HttpFactory implements RequestFactoryInterface,
     public function createUri(string $uri = ''): UriInterface
     {
         if (is_string($uri)) {
-            return $this->createUri($uri);
+            return Uri::createFromString($uri);
         } else {
             throw new \InvalidArgumentException('Not valid URI given');
         }
