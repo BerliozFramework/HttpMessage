@@ -318,9 +318,10 @@ abstract class Message implements MessageInterface
     {
         if (is_null($this->parsedBody)) {
             $contentType = $this->getHeader('Content-Type');
+            $contentType = reset($contentType);
 
-            if (!empty($contentType)) {
-                $contentType = explode(';', reset($contentType));
+            if ($contentType !== false && !empty($contentType)) {
+                $contentType = explode(';', $contentType);
                 $contentType = $contentType[0];
                 $contentType = explode('/', $contentType, 2);
                 $contentType[1] = explode('+', $contentType[1]);
