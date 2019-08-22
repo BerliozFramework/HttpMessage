@@ -27,7 +27,8 @@ use Psr\Http\Message\UploadedFileInterface;
 use Psr\Http\Message\UriFactoryInterface;
 use Psr\Http\Message\UriInterface;
 
-class HttpFactory implements RequestFactoryInterface,
+class HttpFactory implements
+    RequestFactoryInterface,
     ResponseFactoryInterface,
     ServerRequestFactoryInterface,
     StreamFactoryInterface,
