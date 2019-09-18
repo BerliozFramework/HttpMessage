@@ -259,8 +259,16 @@ class UploadedFile implements UploadedFileInterface
             throw new \RuntimeException(sprintf('Uploaded file "%s" has already moved', $this->file));
         }
 
-        if (!is_writable(dirname($targetPath))) {
-            throw new \InvalidArgumentException(sprintf('Target path "%s" is not writable', $targetPath));
+        $directory = dirname($targetPath);
+
+        if (!is_dir($directory)) {
+            if (!mkdir($directory, 0777, true)) {
+                throw new \RuntimeException(sprintf('Error during directory creation "%s"', $directory));
+            }
+        }
+
+        if (!is_writable($directory)) {
+            throw new \InvalidArgumentException(sprintf('Target path "%s" is not writable', $directory));
         }
 
         if (is_uploaded_file($this->file)) {
