@@ -16,6 +16,7 @@ namespace Berlioz\Http\Message;
 
 use Psr\Http\Message\MessageInterface;
 use Psr\Http\Message\StreamInterface;
+use RuntimeException;
 
 abstract class Message implements MessageInterface
 {
@@ -169,7 +170,7 @@ abstract class Message implements MessageInterface
      * immutability of the message, and MUST return an instance that has the
      * new and/or updated header and value.
      *
-     * @param string          $name  Case-insensitive header field name.
+     * @param string $name Case-insensitive header field name.
      * @param string|string[] $value Header value(s).
      *
      * @return static
@@ -209,7 +210,7 @@ abstract class Message implements MessageInterface
     {
         foreach ($headers as $name => $value) {
             $name = mb_convert_case($name, MB_CASE_TITLE);
-            $this->headers[$name] = (array) $value;
+            $this->headers[$name] = (array)$value;
         }
 
         return $this;
@@ -226,7 +227,7 @@ abstract class Message implements MessageInterface
      * immutability of the message, and MUST return an instance that has the
      * new header and/or value.
      *
-     * @param string          $name  Case-insensitive header field name to add.
+     * @param string $name Case-insensitive header field name to add.
      * @param string|string[] $value Header value(s).
      *
      * @return static
@@ -236,7 +237,7 @@ abstract class Message implements MessageInterface
     {
         $clone = clone $this;
         $name = mb_convert_case($name, MB_CASE_TITLE);
-        $clone->headers[$name] = array_merge($clone->headers[$name] ?? [], (array) $value);
+        $clone->headers[$name] = array_merge($clone->headers[$name] ?? [], (array)$value);
 
         return $clone;
     }
@@ -295,6 +296,7 @@ abstract class Message implements MessageInterface
     {
         $clone = clone $this;
         $clone->body = $body;
+        $clone->parsedBody = null;
 
         return $clone;
     }
@@ -316,43 +318,45 @@ abstract class Message implements MessageInterface
      */
     public function getParsedBody()
     {
-        if (is_null($this->parsedBody)) {
-            $contentType = $this->getHeader('Content-Type');
-            $contentType = reset($contentType);
+        if ($this->parsedBody) {
+            return $this->parsedBody;
+        }
 
-            if ($contentType !== false && !empty($contentType)) {
-                $contentType = explode(';', $contentType);
-                $contentType = $contentType[0];
-                $contentType = explode('/', $contentType, 2);
-                $contentType[1] = explode('+', $contentType[1]);
-                $contentType = $contentType[0] . '/' . $contentType[1][count($contentType[1]) - 1];
+        $contentType = $this->getHeader('Content-Type');
+        $contentType = reset($contentType);
 
-                if (isset(self::$bodyParser[$contentType]) && is_callable(self::$bodyParser[$contentType])) {
-                    $bodyParser = self::$bodyParser[$contentType];
-                    $parsedBody = $bodyParser((string) $this->getBody());
-                } else {
-                    switch ($contentType) {
-                        case 'application/x-www-form-urlencoded':
-                            $parsedBody = [];
-                            parse_str((string) $this->getBody(), $parsedBody);
-                            break;
-                        case 'multipart/form-data':
-                            $parsedBody = $_POST;
-                            break;
-                        case 'application/json':
-                            $parsedBody = json_decode((string) $this->getBody());
-                            break;
-                        default:
-                            $parsedBody = null;
-                    }
-                }
+        if ($contentType !== false && !empty($contentType)) {
+            $contentType = explode(';', $contentType);
+            $contentType = $contentType[0];
+            $contentType = explode('/', $contentType, 2);
+            $contentType[1] = explode('+', $contentType[1]);
+            $contentType = $contentType[0] . '/' . $contentType[1][count($contentType[1]) - 1];
 
-                if (!is_null($parsedBody) && !is_array($parsedBody) && !is_object($parsedBody)) {
-                    throw new \RuntimeException('Parsed body must be an array or an object or must be null.');
-                } else {
-                    $this->parsedBody = $parsedBody;
+            if (isset(self::$bodyParser[$contentType]) && is_callable(self::$bodyParser[$contentType])) {
+                $bodyParser = self::$bodyParser[$contentType];
+                $parsedBody = $bodyParser((string)$this->getBody());
+            } else {
+                switch ($contentType) {
+                    case 'application/x-www-form-urlencoded':
+                        $parsedBody = [];
+                        parse_str((string)$this->getBody(), $parsedBody);
+                        break;
+                    case 'multipart/form-data':
+                        $parsedBody = $_POST;
+                        break;
+                    case 'application/json':
+                        $parsedBody = json_decode((string)$this->getBody());
+                        break;
+                    default:
+                        $parsedBody = null;
                 }
             }
+
+            if (!is_null($parsedBody) && !is_array($parsedBody) && !is_object($parsedBody)) {
+                throw new RuntimeException('Parsed body must be an array or an object or must be null.');
+            }
+
+            $this->parsedBody = $parsedBody;
         }
 
         return $this->parsedBody;
@@ -398,12 +402,12 @@ abstract class Message implements MessageInterface
     /**
      * Add body parser
      *
-     * @param string|string[] $mime     Body     parser
-     * @param callable        $callable Callable parser
+     * @param string|string[] $mime Body     parser
+     * @param callable $callable Callable parser
      */
     public static function addBodyParser($mime, callable $callable)
     {
-        foreach ((array) $mime as $aMime) {
+        foreach ((array)$mime as $aMime) {
             self::$bodyParser[$aMime] = $callable;
         }
     }
