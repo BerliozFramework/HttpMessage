@@ -3,11 +3,11 @@
   "description": "Berlioz HTTP Message",
   "minimum-stability": "stable",
   "license": "MIT",
-  "homepage": "http://www.berlioz-framework.com",
+  "homepage": "https://getberlioz.com",
   "authors": [
     {
       "name": "Ronan Giron",
-      "email": "ronan.giron@berlioz-framework.com"
+      "email": "ronan@getberlioz.com"
     }
   ],
   "autoload": {
