@@ -31,7 +31,7 @@ class Stream implements StreamInterface
     public function __construct($fp = null)
     {
         if (is_null($fp)) {
-            $this->fp = fopen('php://memory', 'r+');
+            $this->fp = fopen('php://temp', 'r+');
         } else {
             if (is_resource($fp)) {
                 $this->fp = $fp;
