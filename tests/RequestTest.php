@@ -13,7 +13,7 @@ class RequestTest extends TestCase
         return [// Default values
                 [new Request('get',
                              new Uri('http',
-                                     'www.berlioz-framework.com',
+                                     'getberlioz.com',
                                      null,
                                      '/path/path/index.php')),
                  ['method'        => 'GET',
@@ -21,7 +21,7 @@ class RequestTest extends TestCase
                 // Complete constructor
                 [new Request('post',
                              new Uri('http',
-                                     'www.berlioz-framework.com',
+                                     'getberlioz.com',
                                      null,
                                      '/path/path/index.php'),
                              '/path/index.php'),
@@ -48,7 +48,7 @@ class RequestTest extends TestCase
     {
         return new Request('get',
                            new Uri('http',
-                                   'www.berlioz-framework.com',
+                                   'getberlioz.com',
                                    null,
                                    '/path/path/index.php',
                                    'test=test&test2=test2',
@@ -78,10 +78,11 @@ class RequestTest extends TestCase
         $request = $this->getRequestToTest();
         $uri = $request->getUri();
         $uri2 = new Uri('http',
-                        'www.berlioz-framework.com',
+                        'getberlioz.com',
                         null,
                         '/path/index.php');
         $request2 = $request->withUri($uri2);
+        $this->assertNotEquals($request, $request2);
         $this->assertEquals($uri, $request->getUri());
         $this->assertEquals($uri2, $request2->getUri());
     }

@@ -10,6 +10,7 @@ namespace Berlioz\Http\Message\Tests;
 
 use Berlioz\Http\Message\Message;
 use Berlioz\Http\Message\Stream;
+use Berlioz\Http\Message\Tests\Parser\FakeParser;
 use PHPUnit\Framework\TestCase;
 
 class MessageTest extends TestCase
@@ -17,12 +18,13 @@ class MessageTest extends TestCase
     private function newMessageObj()
     {
         return new
-        class extends Message
-        {
+        class extends Message {
             public function __construct()
             {
-                $this->headers = ['Content-Type'  => ['application/json'],
-                                  'X-Header-Test' => ['Test', 'Test2']];
+                $this->headers = [
+                    'Content-Type' => ['application/json'],
+                    'X-Header-Test' => ['Test', 'Test2'],
+                ];
                 $this->body = new Stream();
             }
         };
@@ -60,9 +62,13 @@ class MessageTest extends TestCase
     {
         $message = $this->newMessageObj();
 
-        $this->assertEquals(['Content-Type'  => ['application/json'],
-                             'X-Header-Test' => ['Test', 'Test2']],
-                            $message->getHeaders());
+        $this->assertEquals(
+            [
+                'Content-Type' => ['application/json'],
+                'X-Header-Test' => ['Test', 'Test2'],
+            ],
+            $message->getHeaders()
+        );
     }
 
     public function testWithHeader()
@@ -125,7 +131,7 @@ class MessageTest extends TestCase
         $stream = new Stream();
         $stream->write('{"json": true}');
         $message = $message->withBody($stream)
-                           ->withHeader('Content-Type', 'application/json');
+            ->withHeader('Content-Type', 'application/json');
 
         $this->assertObjectHasAttribute('json', $message->getParsedBody());
     }
@@ -136,8 +142,8 @@ class MessageTest extends TestCase
         $stream = new Stream();
         $stream->write('{"json": true}');
         $message = $message->withBody($stream)
-                           ->withHeader('Content-Type', 'application/json')
-                           ->withParsedBody(['json' => true]);
+            ->withHeader('Content-Type', 'application/json')
+            ->withParsedBody(['json' => true]);
 
         $this->assertArrayHasKey('json', $message->getParsedBody());
     }
@@ -147,15 +153,28 @@ class MessageTest extends TestCase
         $message = $this->newMessageObj();
         $message::addBodyParser(
             'application/json',
-            function ($value) {
-                return json_decode($value, JSON_OBJECT_AS_ARRAY);
-            }
+            FakeParser::class
         );
         $stream = new Stream();
         $stream->write('{"json": true}');
-        $message = $message->withBody($stream)
-                           ->withHeader('Content-Type', 'application/json');
+        $message =
+            $message
+                ->withBody($stream)
+                ->withHeader('Content-Type', 'application/json');
 
         $this->assertArrayHasKey('json', $message->getParsedBody());
+        $this->assertArrayHasKey('application/json', $message::getBodyParsers());
+        $this->assertEquals(FakeParser::class, $message::getBodyParsers()['application/json']);
+    }
+
+    public function testAddBadParser()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+
+        $message = $this->newMessageObj();
+        $message::addBodyParser(
+            'application/json',
+            \stdClass::class
+        );
     }
 }
