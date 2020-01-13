@@ -31,15 +31,16 @@ class ServerRequest extends Request implements ServerRequestInterface
     /** @var array Attributes */
     private $attributes;
 
-    public function __construct($method,
-                                UriInterface $uri,
-                                array $headers,
-                                array $cookies,
-                                array $serverParams,
-                                StreamInterface $body,
-                                array $uploadedFiles = [],
-                                array $attributes = [])
-    {
+    public function __construct(
+        $method,
+        UriInterface $uri,
+        array $headers,
+        array $cookies,
+        array $serverParams,
+        StreamInterface $body,
+        array $uploadedFiles = [],
+        array $attributes = []
+    ) {
         parent::__construct($method, $uri);
 
         $this->cookies = $cookies;
@@ -51,7 +52,7 @@ class ServerRequest extends Request implements ServerRequestInterface
         $this->headers = [];
         foreach ($headers as $name => $value) {
             $name = mb_convert_case($name, MB_CASE_TITLE);
-            $this->headers[$name] = (array) $value;
+            $this->headers[$name] = (array)$value;
         }
     }
 
@@ -72,8 +73,8 @@ class ServerRequest extends Request implements ServerRequestInterface
     /**
      * Retrieve server parameter.
      *
-     * @param string $name    Param name
-     * @param mixed  $default Default value to return if the param does not exist.
+     * @param string $name Param name
+     * @param mixed $default Default value to return if the param does not exist.
      *
      * @return mixed|null
      */
@@ -139,24 +140,24 @@ class ServerRequest extends Request implements ServerRequestInterface
      */
     public function getQueryParams()
     {
-        if (!is_null($this->queryParams)) {
+        if (null !== $this->queryParams) {
             return $this->queryParams;
-        } else {
-            if (!is_null($this->getUri())) {
-                parse_str($this->getUri()->getQuery(), $this->queryParams);
-
-                return $this->queryParams;
-            } else {
-                return [];
-            }
         }
+
+        if (null !== $this->getUri()) {
+            parse_str($this->getUri()->getQuery(), $this->queryParams);
+
+            return $this->queryParams;
+        }
+
+        return [];
     }
 
     /**
      * Retrieve query string argument.
      *
-     * @param string $name    Query param name
-     * @param mixed  $default Default value to return if the param does not exist.
+     * @param string $name Query param name
+     * @param mixed $default Default value to return if the param does not exist.
      *
      * @return mixed|null
      */
@@ -258,11 +259,11 @@ class ServerRequest extends Request implements ServerRequestInterface
      * immutability of the message, and MUST return an instance that has the
      * updated attributes.
      *
-     * @see getAttributes()
-     *
      * @param array $attributes Attributes.
      *
      * @return static
+     * @see getAttributes()
+     *
      */
     public function withAttributes(array $attributes)
     {
@@ -282,12 +283,12 @@ class ServerRequest extends Request implements ServerRequestInterface
      * This method obviates the need for a hasAttribute() method, as it allows
      * specifying a default value to return if the attribute is not found.
      *
-     * @see getAttributes()
-     *
-     * @param string $name    The attribute name.
-     * @param mixed  $default Default value to return if the attribute does not exist.
+     * @param string $name The attribute name.
+     * @param mixed $default Default value to return if the attribute does not exist.
      *
      * @return mixed
+     * @see getAttributes()
+     *
      */
     public function getAttribute($name, $default = null)
     {
@@ -304,12 +305,12 @@ class ServerRequest extends Request implements ServerRequestInterface
      * immutability of the message, and MUST return an instance that has the
      * updated attribute.
      *
-     * @see getAttributes()
-     *
-     * @param string $name  The attribute name.
-     * @param mixed  $value The value of the attribute.
+     * @param string $name The attribute name.
+     * @param mixed $value The value of the attribute.
      *
      * @return static
+     * @see getAttributes()
+     *
      */
     public function withAttribute($name, $value)
     {
@@ -329,11 +330,11 @@ class ServerRequest extends Request implements ServerRequestInterface
      * immutability of the message, and MUST return an instance that removes
      * the attribute.
      *
-     * @see getAttributes()
-     *
      * @param string $name The attribute name.
      *
      * @return static
+     * @see getAttributes()
+     *
      */
     public function withoutAttribute($name)
     {
@@ -350,16 +351,14 @@ class ServerRequest extends Request implements ServerRequestInterface
      */
     public function isAjaxRequest()
     {
-        // Check if ajax request
-        {
-            $ajaxRequest = $this->hasHeader('AjaxRequest');
-
-            $serverParams = $this->getServerParams();
-            if (!$ajaxRequest && !empty($serverParams['HTTP_X_REQUESTED_WITH']) && strtolower($serverParams['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') {
-                $ajaxRequest = true;
-            }
+        if ($this->hasHeader('AjaxRequest')) {
+            return true;
         }
 
-        return $ajaxRequest;
+        if ($this->getServerParam('HTTP_X_REQUESTED_WITH', '') == 'xmlhttprequest') {
+            return true;
+        }
+
+        return false;
     }
 }

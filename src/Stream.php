@@ -14,7 +14,9 @@ declare(strict_types=1);
 
 namespace Berlioz\Http\Message;
 
+use Exception;
 use Psr\Http\Message\StreamInterface;
+use RuntimeException;
 
 /**
  * Class Stream.
@@ -24,7 +26,7 @@ use Psr\Http\Message\StreamInterface;
 class Stream implements StreamInterface
 {
     /** @var resource Stream */
-    private $fp;
+    protected $fp;
 
     /**
      * Stream constructor.
@@ -35,14 +37,14 @@ class Stream implements StreamInterface
      */
     public function __construct($fp = null)
     {
-        if (is_null($fp)) {
+        if (null !== $fp && !is_resource($fp)) {
+            throw new RuntimeException('Parameter must be a resource type or null value.');
+        }
+
+        $this->fp = $fp;
+
+        if (null === $fp) {
             $this->fp = fopen('php://temp', 'r+');
-        } else {
-            if (is_resource($fp)) {
-                $this->fp = $fp;
-            } else {
-                throw new \RuntimeException('Parameter must be a resource type or null value.');
-            }
         }
     }
 
@@ -62,13 +64,13 @@ class Stream implements StreamInterface
      */
     public function __toString()
     {
-        if (is_resource($this->fp)) {
-            try {
-                return $this->getContents();
-            } catch (\Exception $e) {
-                return '';
-            }
-        } else {
+        if (!is_resource($this->fp)) {
+            return '';
+        }
+
+        try {
+            return $this->getContents();
+        } catch (Exception $e) {
             return '';
         }
     }
@@ -107,15 +109,17 @@ class Stream implements StreamInterface
      */
     public function getSize()
     {
-        if (is_resource($this->fp)) {
-            $stats = fstat($this->fp);
-
-            if (isset($stats['size'])) {
-                return $stats['size'];
-            }
+        if (!is_resource($this->fp)) {
+            return null;
         }
 
-        return null;
+        $stats = fstat($this->fp);
+
+        if (!isset($stats['size'])) {
+            return null;
+        }
+
+        return $stats['size'];
     }
 
     /**
@@ -127,7 +131,7 @@ class Stream implements StreamInterface
     public function tell()
     {
         if (!is_resource($this->fp) || ($position = ftell($this->fp)) === false) {
-            throw new \RuntimeException('Unable to get position of pointer in stream');
+            throw new RuntimeException('Unable to get position of pointer in stream');
         }
 
         return $position;
@@ -140,11 +144,11 @@ class Stream implements StreamInterface
      */
     public function eof()
     {
-        if (is_resource($this->fp)) {
-            return feof($this->fp);
-        } else {
+        if (!is_resource($this->fp)) {
             return false;
         }
+
+        return feof($this->fp);
     }
 
     /**
@@ -174,7 +178,7 @@ class Stream implements StreamInterface
     public function seek($offset, $whence = SEEK_SET)
     {
         if (!is_resource($this->fp) || fseek($this->fp, $offset, $whence) == -1) {
-            throw new \RuntimeException('Unable to seek stream');
+            throw new RuntimeException('Unable to seek stream');
         }
     }
 
@@ -191,7 +195,7 @@ class Stream implements StreamInterface
     public function rewind()
     {
         if (!is_resource($this->fp) || rewind($this->fp) === false) {
-            throw new \RuntimeException('Unable to rewind stream');
+            throw new RuntimeException('Unable to rewind stream');
         }
     }
 
@@ -202,11 +206,11 @@ class Stream implements StreamInterface
      */
     public function isWritable()
     {
-        if (!is_null($mode = $this->getMetadata('mode'))) {
-            return in_array($mode, ['r+', 'w', 'w+', 'a', 'a+', 'x', 'x+', 'c', 'c+']);
-        } else {
+        if (null === ($mode = $this->getMetadata('mode'))) {
             return false;
         }
+
+        return in_array($mode, ['r+', 'w', 'w+', 'a', 'a+', 'x', 'x+', 'c', 'c+']);
     }
 
     /**
@@ -220,7 +224,7 @@ class Stream implements StreamInterface
     public function write($string)
     {
         if (($written = fwrite($this->fp, $string)) === false) {
-            throw new \RuntimeException('Unable to write string to the stream');
+            throw new RuntimeException('Unable to write string to the stream');
         }
 
         return $written;
@@ -233,17 +237,17 @@ class Stream implements StreamInterface
      */
     public function isReadable()
     {
-        if (is_resource($this->fp) && !is_null($mode = $this->getMetadata('mode'))) {
-            foreach (['r', 'r+', 'w+', 'a+', 'x+', 'c+'] as $rMode) {
-                if (stripos($mode, $rMode) === 0) {
-                    return true;
-                }
-            }
-
-            return false;
-        } else {
+        if (!is_resource($this->fp) || null === ($mode = $this->getMetadata('mode'))) {
             return false;
         }
+
+        foreach (['r', 'r+', 'w+', 'a+', 'x+', 'c+'] as $rMode) {
+            if (stripos($mode, $rMode) === 0) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -260,7 +264,7 @@ class Stream implements StreamInterface
     public function read($length)
     {
         if (!$this->isReadable() || ($data = fread($this->fp, $length)) === false) {
-            throw new \RuntimeException('Unable to read stream');
+            throw new RuntimeException('Unable to read stream');
         }
 
         return $data;
@@ -276,7 +280,7 @@ class Stream implements StreamInterface
     public function getContents()
     {
         if (!$this->isReadable() || ($contents = stream_get_contents($this->fp, -1, 0)) === false) {
-            throw new \RuntimeException('Unable to get contents of stream');
+            throw new RuntimeException('Unable to get contents of stream');
         }
 
         return $contents;
@@ -300,14 +304,14 @@ class Stream implements StreamInterface
     {
         $metas = stream_get_meta_data($this->fp);
 
-        if (!is_null($key)) {
+        if (null !== $key) {
             if (isset($metas[$key])) {
                 return $metas[$key];
-            } else {
-                return null;
             }
-        } else {
-            return $metas;
+
+            return null;
         }
+
+        return $metas;
     }
 }

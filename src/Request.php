@@ -39,13 +39,13 @@ class Request extends Message implements RequestInterface
     /**
      * Request constructor.
      *
-     * @param string                         $method
+     * @param string $method
      * @param \Psr\Http\Message\UriInterface $uri
-     * @param string|null                    $requestTarget
+     * @param string|null $requestTarget
      */
     public function __construct(string $method, UriInterface $uri, string $requestTarget = null)
     {
-        $this->method = mb_strtoupper($method);
+        $this->method = strtoupper($method);
         $this->uri = $uri;
         $this->requestTarget = $requestTarget;
     }
@@ -70,17 +70,17 @@ class Request extends Message implements RequestInterface
     {
         if (!empty($this->requestTarget)) {
             return $this->requestTarget;
-        } else {
-            $this->requestTarget = '';
-            $this->requestTarget .= $this->getUri()->getPath() ?? '/';
-
-            $query = $this->getUri()->getQuery();
-            if (!empty($query)) {
-                $this->requestTarget .= '?' . $query;
-            }
-
-            return $this->requestTarget;
         }
+
+        $this->requestTarget = '';
+        $this->requestTarget .= $this->getUri()->getPath() ?? '/';
+
+        $query = $this->getUri()->getQuery();
+        if (!empty($query)) {
+            $this->requestTarget .= '?' . $query;
+        }
+
+        return $this->requestTarget;
     }
 
     /**
@@ -139,7 +139,7 @@ class Request extends Message implements RequestInterface
     public function withMethod($method)
     {
         $clone = clone $this;
-        $clone->method = mb_strtoupper($method);
+        $clone->method = strtoupper($method);
 
         return $clone;
     }
@@ -185,8 +185,8 @@ class Request extends Message implements RequestInterface
      *
      * @link http://tools.ietf.org/html/rfc3986#section-4.3
      *
-     * @param UriInterface $uri          New request URI to use.
-     * @param bool         $preserveHost Preserve the original state of the Host header.
+     * @param UriInterface $uri New request URI to use.
+     * @param bool $preserveHost Preserve the original state of the Host header.
      *
      * @return static
      */
