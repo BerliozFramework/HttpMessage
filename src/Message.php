@@ -14,6 +14,11 @@ declare(strict_types=1);
 
 namespace Berlioz\Http\Message;
 
+use Berlioz\Http\Message\Parser\FormDataParser;
+use Berlioz\Http\Message\Parser\FormUrlEncodedParser;
+use Berlioz\Http\Message\Parser\JsonParser;
+use Berlioz\Http\Message\Parser\ParserInterface;
+use InvalidArgumentException;
 use Psr\Http\Message\MessageInterface;
 use Psr\Http\Message\StreamInterface;
 use RuntimeException;
@@ -29,7 +34,11 @@ abstract class Message implements MessageInterface
     /** @var null|array|object Parsed body */
     protected $parsedBody;
     /** @var callable[] Body parser */
-    protected static $bodyParser = [];
+    protected static $bodyParser = [
+        'application/json' => JsonParser::class,
+        'application/x-www-form-urlencoded' => FormUrlEncodedParser::class,
+        'multipart/form-data' => FormDataParser::class,
+    ];
 
     /**
      * Retrieves the HTTP protocol version as a string.
@@ -271,7 +280,7 @@ abstract class Message implements MessageInterface
      */
     public function getBody()
     {
-        if (is_null($this->body)) {
+        if (null === $this->body) {
             $this->body = new Stream();
         }
 
@@ -325,41 +334,26 @@ abstract class Message implements MessageInterface
         $contentType = $this->getHeader('Content-Type');
         $contentType = reset($contentType);
 
-        if ($contentType !== false && !empty($contentType)) {
-            $contentType = explode(';', $contentType);
-            $contentType = $contentType[0];
-            $contentType = explode('/', $contentType, 2);
-            $contentType[1] = explode('+', $contentType[1]);
-            $contentType = $contentType[0] . '/' . $contentType[1][count($contentType[1]) - 1];
-
-            if (isset(self::$bodyParser[$contentType]) && is_callable(self::$bodyParser[$contentType])) {
-                $bodyParser = self::$bodyParser[$contentType];
-                $parsedBody = $bodyParser((string)$this->getBody());
-            } else {
-                switch ($contentType) {
-                    case 'application/x-www-form-urlencoded':
-                        $parsedBody = [];
-                        parse_str((string)$this->getBody(), $parsedBody);
-                        break;
-                    case 'multipart/form-data':
-                        $parsedBody = $_POST;
-                        break;
-                    case 'application/json':
-                        $parsedBody = json_decode((string)$this->getBody());
-                        break;
-                    default:
-                        $parsedBody = null;
-                }
-            }
-
-            if (!is_null($parsedBody) && !is_array($parsedBody) && !is_object($parsedBody)) {
-                throw new RuntimeException('Parsed body must be an array or an object or must be null.');
-            }
-
-            $this->parsedBody = $parsedBody;
+        if (empty($contentType)) {
+            return $this->parsedBody;
         }
 
-        return $this->parsedBody;
+        $contentType = explode(';', $contentType);
+        $contentType = $contentType[0];
+        $contentType = explode('/', $contentType, 2);
+        $contentType[1] = explode('+', $contentType[1]);
+        $contentType = $contentType[0] . '/' . $contentType[1][count($contentType[1]) - 1];
+
+        $parsedBody = null;
+        if (isset(static::$bodyParser[$contentType])) {
+            $parsedBody = call_user_func([static::$bodyParser[$contentType], 'parseMessageBody'], $this);
+        }
+
+        if (null !== $parsedBody && !is_array($parsedBody) && !is_object($parsedBody)) {
+            throw new RuntimeException('Parsed body must be an array or an object or must be null.');
+        }
+
+        return $this->parsedBody = $parsedBody;
     }
 
     /**
@@ -400,15 +394,33 @@ abstract class Message implements MessageInterface
     }
 
     /**
-     * Add body parser
+     * Get body parsers.
      *
-     * @param string|string[] $mime Body     parser
-     * @param callable $callable Callable parser
+     * @return string[]
      */
-    public static function addBodyParser($mime, callable $callable)
+    public static function getBodyParsers(): array
     {
+        return static::$bodyParser;
+    }
+
+    /**
+     * Add body parser.
+     *
+     * @param string|string[] $mime Body parser
+     * @param string $parserClass Parser class
+     *
+     * @throws \InvalidArgumentException
+     */
+    public static function addBodyParser($mime, string $parserClass)
+    {
+        if (!is_a($parserClass, ParserInterface::class, true)) {
+            throw new InvalidArgumentException(
+                sprintf('Parser class must implements %s interface', ParserInterface::class)
+            );
+        }
+
         foreach ((array)$mime as $aMime) {
-            self::$bodyParser[$aMime] = $callable;
+            static::$bodyParser[$aMime] = $parserClass;
         }
     }
 }

@@ -38,17 +38,25 @@ class Uri implements UriInterface
     /**
      * Uri constructor.
      *
-     * @param string   $scheme   Scheme of uri
-     * @param string   $host     Host of uri
-     * @param int|null $port     Port of uri
-     * @param string   $path     Path  of uri
-     * @param string   $query    Query  of uri
-     * @param string   $fragment Fragment of uri
-     * @param string   $user     User of uri
-     * @param string   $password Password of uri
+     * @param string $scheme Scheme of uri
+     * @param string $host Host of uri
+     * @param int|null $port Port of uri
+     * @param string $path Path  of uri
+     * @param string $query Query  of uri
+     * @param string $fragment Fragment of uri
+     * @param string $user User of uri
+     * @param string $password Password of uri
      */
-    public function __construct($scheme, $host, $port = null, $path = '/', $query = '', $fragment = '', $user = '', $password = '')
-    {
+    public function __construct(
+        $scheme,
+        $host,
+        $port = null,
+        $path = '/',
+        $query = '',
+        $fragment = '',
+        $user = '',
+        $password = ''
+    ) {
         $this->scheme = $scheme;
         $this->host = $host;
         $this->port = $port;
@@ -70,14 +78,16 @@ class Uri implements UriInterface
     {
         $parsedUrl = parse_url($str);
 
-        return new self($parsedUrl['scheme'] ?? '',
-                        $parsedUrl['host'] ?? null,
-                        $parsedUrl['port'] ?? null,
-                        $parsedUrl['path'] ?? '/',
-                        $parsedUrl['query'] ?? '',
-                        $parsedUrl['fragment'] ?? '',
-                        $parsedUrl['user'] ?? '',
-                        $parsedUrl['pass'] ?? '');
+        return new self(
+            $parsedUrl['scheme'] ?? '',
+            $parsedUrl['host'] ?? null,
+            $parsedUrl['port'] ?? null,
+            $parsedUrl['path'] ?? '/',
+            $parsedUrl['query'] ?? '',
+            $parsedUrl['fragment'] ?? '',
+            $parsedUrl['user'] ?? '',
+            $parsedUrl['pass'] ?? ''
+        );
     }
 
     /**
@@ -96,7 +106,7 @@ class Uri implements UriInterface
      */
     public function getScheme()
     {
-        return $this->scheme ?? '';
+        return strtolower($this->scheme) ?? '';
     }
 
     /**
@@ -130,7 +140,7 @@ class Uri implements UriInterface
         $authority .= $this->getHost();
 
         // Port
-        if (!is_null($port = $this->getPort())) {
+        if (null !== ($port = $this->getPort())) {
             $authority .= ':' . $port;
         }
 
@@ -200,22 +210,22 @@ class Uri implements UriInterface
      */
     public function getPort()
     {
-        switch (mb_strtolower($this->getScheme())) {
+        switch ($this->getScheme()) {
             case 'http':
                 if ($this->port != 80) {
                     return $this->port;
                 }
-                break;
+
+                return null;
             case 'https':
                 if ($this->port != 443) {
                     return $this->port;
                 }
-                break;
+
+                return null;
             default:
                 return $this->port ?? null;
         }
-
-        return null;
     }
 
     /**
@@ -328,7 +338,7 @@ class Uri implements UriInterface
      * user; an empty string for the user is equivalent to removing user
      * information.
      *
-     * @param string      $user     The user name to use for authority.
+     * @param string $user The user name to use for authority.
      * @param null|string $password The password associated with $user.
      *
      * @return static A new instance with the specified user information.
@@ -497,9 +507,10 @@ class Uri implements UriInterface
         $query = $this->getQuery();
         $fragment = $this->getFragment();
 
-        return (!empty($authority) ? (!empty($scheme) ? $scheme . ':' : '') . '//' . $authority : '') .
-               $this->getPath() .
-               (!empty($query) ? '?' . $query : '') .
-               (!empty($fragment) ? '#' . $fragment : '');
+        return
+            (!empty($authority) ? (!empty($scheme) ? $scheme . ':' : '') . '//' . $authority : '') .
+            $this->getPath() .
+            (!empty($query) ? '?' . $query : '') .
+            (!empty($fragment) ? '#' . $fragment : '');
     }
 }

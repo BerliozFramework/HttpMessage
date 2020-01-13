@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Berlioz\Http\Message;
 
+use InvalidArgumentException;
 use Psr\Http\Message\RequestFactoryInterface;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseFactoryInterface;
@@ -26,6 +27,9 @@ use Psr\Http\Message\UploadedFileFactoryInterface;
 use Psr\Http\Message\UploadedFileInterface;
 use Psr\Http\Message\UriFactoryInterface;
 use Psr\Http\Message\UriInterface;
+use RuntimeException;
+
+use const UPLOAD_ERR_OK;
 
 class HttpFactory implements
     RequestFactoryInterface,
@@ -69,7 +73,7 @@ class HttpFactory implements
         }
 
         // Body ?
-        if (!is_null($body)) {
+        if (null !== $body) {
             if ($body instanceof StreamInterface) {
                 $request = $request->withBody($body);
             }
@@ -117,7 +121,11 @@ class HttpFactory implements
         $protocolVersion = '1.1'
     ): ResponseInterface {
         $stream = null;
-        if (!is_null($body)) {
+        if (null !== $body) {
+            if ($body instanceof StreamInterface) {
+                $stream = $body;
+            }
+
             if (is_resource($body)) {
                 $stream = $this->createStreamFromResource($body);
             }
@@ -127,12 +135,13 @@ class HttpFactory implements
             }
         }
 
-        $response = new Response(
-            $stream,
-            $code,
-            $headers,
-            $reasonPhrase
-        );
+        $response =
+            new Response(
+                $stream,
+                $code,
+                $headers,
+                $reasonPhrase
+            );
 
         // Protocol version ?
         if ($protocolVersion != $response->getProtocolVersion()) {
@@ -208,11 +217,11 @@ class HttpFactory implements
     public function createStreamFromFile(string $filename, string $mode = 'r'): StreamInterface
     {
         if (!in_array($mode, ['r', 'r+', 'w+', 'a+', 'c+'])) {
-            throw new \InvalidArgumentException(sprintf('Invalid mode "%s" to read file "%s"', $mode));
+            throw new InvalidArgumentException(sprintf('Invalid mode "%s" to read file "%s"', $mode, $filename));
         }
 
         if (($resource = @fopen($filename, $mode)) === false) {
-            throw new \RuntimeException(sprintf('Unable to open file "%s" with mode "%s"', $filename, $mode));
+            throw new RuntimeException(sprintf('Unable to open file "%s" with mode "%s"', $filename, $mode));
         }
 
         // Read file
@@ -264,12 +273,12 @@ class HttpFactory implements
     public function createUploadedFile(
         StreamInterface $stream,
         int $size = null,
-        int $error = \UPLOAD_ERR_OK,
+        int $error = UPLOAD_ERR_OK,
         string $clientFilename = null,
         string $clientMediaType = null,
         string $filename = ''
     ): UploadedFileInterface {
-        if (is_null($size)) {
+        if (null === $size) {
             $size = $stream->getSize();
         }
 
@@ -293,10 +302,10 @@ class HttpFactory implements
      */
     public function createUri(string $uri = ''): UriInterface
     {
-        if (is_string($uri)) {
-            return Uri::createFromString($uri);
-        } else {
-            throw new \InvalidArgumentException('Not valid URI given');
+        if (!is_string($uri)) {
+            throw new InvalidArgumentException('Not valid URI given');
         }
+
+        return Uri::createFromString($uri);
     }
 }

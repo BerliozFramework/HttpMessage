@@ -15,8 +15,10 @@ declare(strict_types=1);
 
 namespace Berlioz\Http\Message;
 
+use InvalidArgumentException;
 use Psr\Http\Message\StreamInterface;
 use Psr\Http\Message\UploadedFileInterface;
+use RuntimeException;
 
 class UploadedFile implements UploadedFileInterface
 {
@@ -59,11 +61,13 @@ class UploadedFile implements UploadedFileInterface
                         continue;
                     }
 
-                    return new UploadedFile($array['tmp_name'],
-                                            $array['name'] ?: '',
-                                            $array['type'] ?: '',
-                                            $array['size'] ?: 0,
-                                            $array['error'] ?: 0);
+                    return new UploadedFile(
+                        $array['tmp_name'],
+                        $array['name'] ?: '',
+                        $array['type'] ?: '',
+                        $array['size'] ?: 0,
+                        $array['error'] ?: 0
+                    );
                 }
 
                 return $result;
@@ -97,13 +101,15 @@ class UploadedFile implements UploadedFileInterface
         foreach ($files as $field => $data) {
             foreach ($data as $val) {
                 $result[$field] = [];
+
                 if (!is_array($val)) {
                     $result[$field] = $data;
-                } else {
-                    $res = [];
-                    self::filesFlip($res, [], $data);
-                    $result[$field] += $res;
+                    continue;
                 }
+
+                $res = [];
+                self::filesFlip($res, [], $data);
+                $result[$field] += $res;
             }
         }
 
@@ -130,28 +136,30 @@ class UploadedFile implements UploadedFileInterface
                 array_push($newKeys, $k);
                 self::filesFlip($result, $newKeys, $v);
             }
-        } else {
-            $res = $value;
-            // Move the innermost key to the outer spot
-            $first = array_shift($keys);
-            array_push($keys, $first);
-            foreach (array_reverse($keys) as $k) {
-                // You might think we'd say $res[$k] = $res, but $res starts out not as an array
-                $res = [$k => $res];
-            }
 
-            $result = array_replace_recursive($result, $res);
+            return;
         }
+
+        $res = $value;
+        // Move the innermost key to the outer spot
+        $first = array_shift($keys);
+        array_push($keys, $first);
+        foreach (array_reverse($keys) as $k) {
+            // You might think we'd say $res[$k] = $res, but $res starts out not as an array
+            $res = [$k => $res];
+        }
+
+        $result = array_replace_recursive($result, $res);
     }
 
     /**
      * UploadedFile constructor
      *
-     * @param string $file  File
-     * @param string $name  Client name of file
-     * @param string $type  Client type of file
-     * @param int    $size  Size
-     * @param int    $error PHP error code
+     * @param string $file File
+     * @param string $name Client name of file
+     * @param string $type Client type of file
+     * @param int $size Size
+     * @param int $error PHP error code
      */
     public function __construct(string $file, string $name, string $type, int $size, int $error)
     {
@@ -173,6 +181,16 @@ class UploadedFile implements UploadedFileInterface
     }
 
     /**
+     * Is uploaded file?
+     *
+     * @return bool
+     */
+    public function isUploadedFile(): bool
+    {
+        return is_uploaded_file($this->file);
+    }
+
+    /**
      * Retrieve a stream representing the uploaded file.
      *
      * This method MUST return a StreamInterface instance, representing the
@@ -191,10 +209,10 @@ class UploadedFile implements UploadedFileInterface
     public function getStream()
     {
         if ($this->hasMoved()) {
-            throw new \RuntimeException(sprintf('Uploaded file "%s" has already moved', $this->file));
+            throw new RuntimeException(sprintf('Uploaded file "%s" has already moved', $this->file));
         }
 
-        if (is_null($this->stream)) {
+        if (null === $this->stream) {
             $this->stream = new Stream(fopen($this->file, 'r'));
         }
 
@@ -211,7 +229,7 @@ class UploadedFile implements UploadedFileInterface
     public function setStream(StreamInterface $stream): UploadedFile
     {
         if ($this->hasMoved()) {
-            throw new \RuntimeException(sprintf('Uploaded file "%s" has already moved', $this->file));
+            throw new RuntimeException(sprintf('Uploaded file "%s" has already moved', $this->file));
         }
 
         $this->stream = $stream;
@@ -256,26 +274,26 @@ class UploadedFile implements UploadedFileInterface
     public function moveTo($targetPath)
     {
         if ($this->hasMoved()) {
-            throw new \RuntimeException(sprintf('Uploaded file "%s" has already moved', $this->file));
+            throw new RuntimeException(sprintf('Uploaded file "%s" has already moved', $this->file));
         }
 
         $directory = dirname($targetPath);
 
         if (!is_dir($directory)) {
             if (!mkdir($directory, 0777, true)) {
-                throw new \RuntimeException(sprintf('Error during directory creation "%s"', $directory));
+                throw new RuntimeException(sprintf('Error during directory creation "%s"', $directory));
             }
         }
 
         if (!is_writable($directory)) {
-            throw new \InvalidArgumentException(sprintf('Target path "%s" is not writable', $directory));
+            throw new InvalidArgumentException(sprintf('Target path "%s" is not writable', $directory));
         }
 
-        if (is_uploaded_file($this->file)) {
-            $this->moved = move_uploaded_file($this->file, $targetPath);
-        } else {
-            throw new \RuntimeException(sprintf('"%s" is not a valid uploaded file', $this->file));
+        if (!$this->isUploadedFile()) {
+            throw new RuntimeException(sprintf('"%s" is not a valid uploaded file', $this->file));
         }
+
+        $this->moved = move_uploaded_file($this->file, $targetPath);
     }
 
     /**
@@ -305,7 +323,7 @@ class UploadedFile implements UploadedFileInterface
     public function getHash($algo = 'sha1')
     {
         if ($this->hasMoved()) {
-            throw new \RuntimeException(sprintf('Uploaded file "%s" has already moved', $this->file));
+            throw new RuntimeException(sprintf('Uploaded file "%s" has already moved', $this->file));
         }
 
         return hash_file($algo, $this->file);
@@ -320,21 +338,26 @@ class UploadedFile implements UploadedFileInterface
     public function getMediaType()
     {
         if ($this->hasMoved()) {
-            throw new \RuntimeException(sprintf('Uploaded file "%s" has already moved', $this->file));
+            throw new RuntimeException(sprintf('Uploaded file "%s" has already moved', $this->file));
         }
 
-        if (extension_loaded('fileinfo')) {
-            $finfo = finfo_open(FILEINFO_MIME);
-            $mime = finfo_file($finfo, $this->file);
-            finfo_close($finfo);
-
-            $mime = explode(";", $mime);
-            $mime = trim($mime[0]);
-
-            return $mime;
-        } else {
-            throw new \RuntimeException(sprintf('You must install fileinfo extension to determine the real type of uploaded file "%s"', $this->file));
+        if (!extension_loaded('fileinfo')) {
+            throw new RuntimeException(
+                sprintf(
+                    'You must install fileinfo extension to determine the real type of uploaded file "%s"',
+                    $this->file
+                )
+            );
         }
+
+        $finfo = finfo_open(FILEINFO_MIME);
+        $mime = finfo_file($finfo, $this->file);
+        finfo_close($finfo);
+
+        $mime = explode(";", $mime);
+        $mime = trim($mime[0]);
+
+        return $mime;
     }
 
     /**
