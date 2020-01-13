@@ -51,7 +51,7 @@ class ServerRequest extends Request implements ServerRequestInterface
 
         $this->headers = [];
         foreach ($headers as $name => $value) {
-            $name = mb_convert_case($name, MB_CASE_TITLE);
+            $name = ucwords(strtolower($name), ' -_');
             $this->headers[$name] = (array)$value;
         }
     }
