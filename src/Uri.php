@@ -190,7 +190,7 @@ class Uri implements UriInterface
             return '';
         }
 
-        return mb_strtolower($this->host);
+        return strtolower($this->host);
     }
 
     /**

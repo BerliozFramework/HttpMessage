@@ -115,7 +115,7 @@ abstract class Message implements MessageInterface
      */
     public function hasHeader($name)
     {
-        $name = mb_convert_case($name, MB_CASE_TITLE);
+        $name = ucwords(strtolower($name), ' -_');
 
         return isset($this->headers[$name]);
     }
@@ -137,7 +137,7 @@ abstract class Message implements MessageInterface
      */
     public function getHeader($name)
     {
-        $name = mb_convert_case($name, MB_CASE_TITLE);
+        $name = ucwords(strtolower($name), ' -_');
 
         return $this->headers[$name] ?? [];
     }
@@ -164,7 +164,7 @@ abstract class Message implements MessageInterface
      */
     public function getHeaderLine($name)
     {
-        $name = mb_convert_case($name, MB_CASE_TITLE);
+        $name = ucwords(strtolower($name), ' -_');
 
         return isset($this->headers[$name]) ? implode(', ', $this->headers[$name]) : '';
     }
@@ -218,7 +218,7 @@ abstract class Message implements MessageInterface
     protected function setHeaders(array $headers): MessageInterface
     {
         foreach ($headers as $name => $value) {
-            $name = mb_convert_case($name, MB_CASE_TITLE);
+            $name = ucwords(strtolower($name), ' -_');
             $this->headers[$name] = (array)$value;
         }
 
@@ -245,7 +245,7 @@ abstract class Message implements MessageInterface
     public function withAddedHeader($name, $value)
     {
         $clone = clone $this;
-        $name = mb_convert_case($name, MB_CASE_TITLE);
+        $name = ucwords(strtolower($name), ' -_');
         $clone->headers[$name] = array_merge($clone->headers[$name] ?? [], (array)$value);
 
         return $clone;
@@ -267,7 +267,7 @@ abstract class Message implements MessageInterface
     public function withoutHeader($name)
     {
         $clone = clone $this;
-        $name = mb_convert_case($name, MB_CASE_TITLE);
+        $name = ucwords(strtolower($name), ' -_');
         unset($clone->headers[$name]);
 
         return $clone;

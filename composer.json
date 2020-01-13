@@ -24,7 +24,6 @@
     "php": "^7.1",
     "ext-json": "*",
     "ext-fileinfo": "*",
-    "ext-mbstring": "*",
     "psr/http-message": "^1.0",
     "psr/http-factory": "^1.0"
   },
