@@ -21,3 +21,16 @@ $ composer require berlioz/http-message
 - Packages:
   - **psr/http-message**
   - **psr/http-factory**
+
+## Usage
+
+### Global
+
+Looks at **PSR** documentations:
+- **PSR-7** (HTTP message interfaces): https://www.php-fig.org/psr/psr-7/
+- **PSR-17** (HTTP Factories): https://www.php-fig.org/psr/psr-17/
+
+### Factory
+
+Only one factory class implements the **PSR-17**:
+`\Berlioz\Http\Message\HttpFactory`
