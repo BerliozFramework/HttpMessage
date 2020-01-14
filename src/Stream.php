@@ -223,7 +223,9 @@ class Stream implements StreamInterface
      */
     public function write($string)
     {
-        if (($written = fwrite($this->fp, $string)) === false) {
+        $length = strlen($string);
+
+        if (($written = @fwrite($this->fp, $string)) === false || $written !== $length) {
             throw new RuntimeException('Unable to write string to the stream');
         }
 
