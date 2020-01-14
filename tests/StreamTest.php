@@ -22,7 +22,7 @@ class StreamTest extends TestCase
     {
         $stream = new Stream(fopen($file = __DIR__ . '/test.txt', 'r+'));
         $this->assertFalse($stream->eof());
-        $stream->read($stream->getSize()+1);
+        $stream->read($stream->getSize() + 1);
         $this->assertTrue($stream->eof());
     }
 
@@ -42,13 +42,16 @@ class StreamTest extends TestCase
 
         $this->assertEquals(4, $stream->write('Test'));
         $this->assertEquals(4, $stream->getSize());
+        $this->assertEquals(9, $stream->write('Test é a'));
+        $this->assertEquals(13, $stream->getSize());
     }
 
     public function testWriteFail()
     {
         $stream = new Stream(fopen($file = __DIR__ . '/test.txt', 'r'));
 
-        $this->assertEquals(0, $stream->write('Test'));
+        $this->expectException(RuntimeException::class);
+        $stream->write('Test');
     }
 
     public function testGetMetadata()
