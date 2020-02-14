@@ -216,20 +216,11 @@ class HttpFactory implements
      */
     public function createStreamFromFile(string $filename, string $mode = 'r'): StreamInterface
     {
-        if (!in_array($mode, ['r', 'r+', 'w+', 'a+', 'c+'])) {
-            throw new InvalidArgumentException(sprintf('Invalid mode "%s" to read file "%s"', $mode, $filename));
-        }
-
         if (($resource = @fopen($filename, $mode)) === false) {
             throw new RuntimeException(sprintf('Unable to open file "%s" with mode "%s"', $filename, $mode));
         }
 
-        // Read file
-        rewind($resource);
-        $content = fread($resource, filesize($filename));
-        fclose($resource);
-
-        return $this->createStream($content);
+        return new Stream($resource);
     }
 
     /**
