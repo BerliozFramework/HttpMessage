@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Berlioz\Http\Message;
 
+use InvalidArgumentException;
 use Psr\Http\Message\UriInterface;
 
 class Uri implements UriInterface
@@ -73,10 +74,15 @@ class Uri implements UriInterface
      * @param string $str
      *
      * @return \Berlioz\Http\Message\Uri
+     * @throws \InvalidArgumentException If string cannot be parsed
      */
     public static function createFromString(string $str): self
     {
         $parsedUrl = parse_url($str);
+
+        if (false === $parsedUrl) {
+            throw new InvalidArgumentException('Invalid URI');
+        }
 
         return new self(
             $parsedUrl['scheme'] ?? '',
