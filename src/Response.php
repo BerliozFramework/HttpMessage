@@ -164,9 +164,9 @@ class Response extends Message implements ResponseInterface
      * @param \Psr\Http\Message\StreamInterface|string|null $body Body
      * @param int $statusCode Status code
      * @param array $headers Headers
-     * @param string $reasonPhrase Reason phrase
+     * @param string|null $reasonPhrase Reason phrase
      */
-    public function __construct($body = null, int $statusCode = 200, array $headers = [], string $reasonPhrase = '')
+    public function __construct($body = null, int $statusCode = 200, array $headers = [], ?string $reasonPhrase = '')
     {
         $this->body = new Stream;
 
@@ -181,7 +181,7 @@ class Response extends Message implements ResponseInterface
         }
 
         $this->statusCode = $statusCode;
-        $this->reasonPhrase = $reasonPhrase;
+        $this->reasonPhrase = $reasonPhrase ?? '';
 
         $this->headers = [];
         $this->setHeaders($headers);
@@ -246,6 +246,6 @@ class Response extends Message implements ResponseInterface
      */
     public function getReasonPhrase()
     {
-        return $this->reasonPhrase ?? self::REASONS[$this->statusCode] ?? '';
+        return $this->reasonPhrase ?: self::REASONS[$this->statusCode] ?? '';
     }
 }
