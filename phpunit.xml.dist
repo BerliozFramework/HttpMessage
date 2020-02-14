@@ -1,13 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<phpunit bootstrap="./tests/bootstrap.php" colors="true">
-  <testsuites>
-    <testsuite name="Berlioz Http Message test suite">
-      <directory suffix="Test.php">./tests</directory>
-    </testsuite>
-  </testsuites>
-  <filter>
-    <whitelist processUncoveredFilesFromWhitelist="true">
-      <directory suffix=".php">src</directory>
-    </whitelist>
-  </filter>
+<phpunit bootstrap="./tests/bootstrap.php" colors="true" backupGlobals="true">
+    <testsuites>
+        <testsuite name="Berlioz Http Message test suite">
+            <directory suffix="Test.php">./tests</directory>
+        </testsuite>
+        <testsuite name="http-interop/http-factory-tests">
+            <directory>./vendor/http-interop/http-factory-tests/test</directory>
+        </testsuite>
+    </testsuites>
+    <filter>
+        <whitelist processUncoveredFilesFromWhitelist="true">
+            <directory suffix=".php">src</directory>
+        </whitelist>
+    </filter>
+    <php>
+        <const name="REQUEST_FACTORY" value="Berlioz\Http\Message\HttpFactory"/>
+        <const name="RESPONSE_FACTORY" value="Berlioz\Http\Message\HttpFactory"/>
+        <const name="SERVER_REQUEST_FACTORY" value="Berlioz\Http\Message\HttpFactory"/>
+        <const name="STREAM_FACTORY" value="Berlioz\Http\Message\HttpFactory"/>
+        <const name="UPLOADED_FILE_FACTORY" value="Berlioz\Http\Message\HttpFactory"/>
+        <const name="URI_FACTORY" value="Berlioz\Http\Message\HttpFactory"/>
+    </php>
 </phpunit>
