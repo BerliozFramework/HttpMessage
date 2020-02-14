@@ -161,7 +161,7 @@ class UploadedFile implements UploadedFileInterface
      * @param int $size Size
      * @param int $error PHP error code
      */
-    public function __construct(string $file, string $name, string $type, int $size, int $error)
+    public function __construct(string $file, ?string $name, ?string $type, ?int $size, int $error)
     {
         $this->file = $file;
         $this->name = $name;
@@ -337,6 +337,10 @@ class UploadedFile implements UploadedFileInterface
      */
     public function getMediaType()
     {
+        if ($this->error !== UPLOAD_ERR_OK) {
+            return null;
+        }
+
         if ($this->hasMoved()) {
             throw new RuntimeException(sprintf('Uploaded file "%s" has already moved', $this->file));
         }
