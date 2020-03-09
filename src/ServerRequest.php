@@ -18,6 +18,11 @@ use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\StreamInterface;
 use Psr\Http\Message\UriInterface;
 
+/**
+ * Class ServerRequest.
+ *
+ * @package Berlioz\Http\Message
+ */
 class ServerRequest extends Request implements ServerRequestInterface
 {
     /** @var array Cookies */
