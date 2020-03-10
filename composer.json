@@ -1,6 +1,6 @@
 {
   "name": "berlioz/http-message",
-  "description": "Berlioz HTTP Message",
+  "description": "Berlioz HTTP Message is a PHP library whose implements PSR-7 (HTTP message interfaces) and PSR-17 (HTTP Factories) standards.",
   "minimum-stability": "stable",
   "license": "MIT",
   "homepage": "https://getberlioz.com",
