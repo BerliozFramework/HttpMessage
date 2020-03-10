@@ -31,6 +31,11 @@ use RuntimeException;
 
 use const UPLOAD_ERR_OK;
 
+/**
+ * Class HttpFactory.
+ *
+ * @package Berlioz\Http\Message
+ */
 class HttpFactory implements
     RequestFactoryInterface,
     ResponseFactoryInterface,

@@ -23,6 +23,11 @@ use Psr\Http\Message\MessageInterface;
 use Psr\Http\Message\StreamInterface;
 use RuntimeException;
 
+/**
+ * Class Message.
+ *
+ * @package Berlioz\Http\Message
+ */
 abstract class Message implements MessageInterface
 {
     /** @var string Protocol version */

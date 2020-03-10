@@ -17,6 +17,11 @@ namespace Berlioz\Http\Message;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\UriInterface;
 
+/**
+ * Class Request.
+ *
+ * @package Berlioz\Http\Message
+ */
 class Request extends Message implements RequestInterface
 {
     // HTTP methods

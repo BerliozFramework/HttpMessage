@@ -17,6 +17,11 @@ namespace Berlioz\Http\Message;
 use InvalidArgumentException;
 use Psr\Http\Message\UriInterface;
 
+/**
+ * Class Uri.
+ *
+ * @package Berlioz\Http\Message
+ */
 class Uri implements UriInterface
 {
     /** @var string|null Scheme */

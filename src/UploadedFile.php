@@ -20,6 +20,11 @@ use Psr\Http\Message\StreamInterface;
 use Psr\Http\Message\UploadedFileInterface;
 use RuntimeException;
 
+/**
+ * Class UploadedFile.
+ *
+ * @package Berlioz\Http\Message
+ */
 class UploadedFile implements UploadedFileInterface
 {
     /** @var string File */
