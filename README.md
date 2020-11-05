@@ -20,7 +20,7 @@ $ composer require berlioz/http-message
 
 ### Dependencies
 
-- **PHP** >= 7.1
+- **PHP** ^7.1 || ^8.0
 - PHP libraries:
   - **fileinfo**
   - **json**
