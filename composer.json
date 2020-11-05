@@ -21,15 +21,15 @@
     }
   },
   "require": {
-    "php": "^7.1",
+    "php": "^7.1 || ^8.0",
     "ext-json": "*",
     "ext-fileinfo": "*",
     "psr/http-message": "^1.0",
     "psr/http-factory": "^1.0"
   },
   "require-dev": {
-    "phpunit/phpunit": "^7.5 || ^8.0",
-    "http-interop/http-factory-tests": "^0.6"
+    "phpunit/phpunit": "^7.5 || ^8.0 || ^9.0",
+    "http-interop/http-factory-tests": "^0.7"
   },
   "provide": {
     "psr/http-message-implementation": "^1.0",

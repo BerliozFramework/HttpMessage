@@ -221,6 +221,10 @@ class HttpFactory implements
      */
     public function createStreamFromFile(string $filename, string $mode = 'r'): StreamInterface
     {
+        if (empty($filename)) {
+            throw new RuntimeException('Filename cannot be empty');
+        }
+
         if (($resource = @fopen($filename, $mode)) === false) {
             throw new RuntimeException(sprintf('Unable to open file "%s" with mode "%s"', $filename, $mode));
         }
