@@ -1,9 +1,9 @@
 <?php
-/**
+/*
  * This file is part of Berlioz framework.
  *
  * @license   https://opensource.org/licenses/MIT MIT License
- * @copyright 2017 Ronan GIRON
+ * @copyright 2021 Ronan GIRON
  * @author    Ronan GIRON <https://github.com/ElGigi>
  *
  * For the full copyright and license information, please view the LICENSE
@@ -14,51 +14,29 @@ declare(strict_types=1);
 
 namespace Berlioz\Http\Message;
 
+use InvalidArgumentException;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\StreamInterface;
 use Psr\Http\Message\UriInterface;
 
 /**
  * Class ServerRequest.
- *
- * @package Berlioz\Http\Message
  */
 class ServerRequest extends Request implements ServerRequestInterface
 {
-    /** @var array Cookies */
-    private $cookies;
-    /** @var array Server parameters */
-    private $serverParams;
-    /** @var \Psr\Http\Message\UploadedFileInterface[] Uploaded files */
-    private $uploadedFiles;
-    /** @var array Query parameters */
-    private $queryParams;
-    /** @var array Attributes */
-    private $attributes;
+    private ?array $queryParams = null;
 
     public function __construct(
         $method,
         UriInterface $uri,
         array $headers,
-        array $cookies,
-        array $serverParams,
-        StreamInterface $body,
-        array $uploadedFiles = [],
-        array $attributes = []
+        protected array $cookies,
+        protected array $serverParams,
+        mixed $body = null,
+        protected array $uploadedFiles = [],
+        protected array $attributes = []
     ) {
-        parent::__construct($method, $uri);
-
-        $this->cookies = $cookies;
-        $this->serverParams = $serverParams;
-        $this->body = $body;
-        $this->uploadedFiles = $uploadedFiles;
-        $this->attributes = $attributes;
-
-        $this->headers = [];
-        foreach ($headers as $name => $value) {
-            $name = ucwords(strtolower($name), ' -_');
-            $this->headers[$name] = (array)$value;
-        }
+        parent::__construct($method, $uri, $body, $headers);
     }
 
     /**
@@ -70,7 +48,7 @@ class ServerRequest extends Request implements ServerRequestInterface
      *
      * @return array
      */
-    public function getServerParams()
+    public function getServerParams(): array
     {
         return $this->serverParams;
     }
@@ -81,9 +59,9 @@ class ServerRequest extends Request implements ServerRequestInterface
      * @param string $name Param name
      * @param mixed $default Default value to return if the param does not exist.
      *
-     * @return mixed|null
+     * @return mixed
      */
-    public function getServerParam(string $name, $default = null)
+    public function getServerParam(string $name, mixed $default = null): mixed
     {
         $serverParams = $this->getServerParams();
 
@@ -95,12 +73,11 @@ class ServerRequest extends Request implements ServerRequestInterface
      *
      * Retrieves cookies sent by the client to the server.
      *
-     * The data MUST be compatible with the structure of the $_COOKIE
-     * superglobal.
+     * The data MUST be compatible with the structure of the $_COOKIE superglobal.
      *
      * @return array
      */
-    public function getCookieParams()
+    public function getCookieParams(): array
     {
         return $this->cookies;
     }
@@ -123,7 +100,7 @@ class ServerRequest extends Request implements ServerRequestInterface
      *
      * @return static
      */
-    public function withCookieParams(array $cookies)
+    public function withCookieParams(array $cookies): static
     {
         $clone = clone $this;
         $clone->cookies = $cookies;
@@ -143,7 +120,7 @@ class ServerRequest extends Request implements ServerRequestInterface
      *
      * @return array
      */
-    public function getQueryParams()
+    public function getQueryParams(): array
     {
         if (null !== $this->queryParams) {
             return $this->queryParams;
@@ -164,9 +141,9 @@ class ServerRequest extends Request implements ServerRequestInterface
      * @param string $name Query param name
      * @param mixed $default Default value to return if the param does not exist.
      *
-     * @return mixed|null
+     * @return mixed
      */
-    public function getQueryParam(string $name, $default = null)
+    public function getQueryParam(string $name, $default = null): mixed
     {
         $queryParams = $this->getQueryParams();
 
@@ -196,7 +173,7 @@ class ServerRequest extends Request implements ServerRequestInterface
      *
      * @return static
      */
-    public function withQueryParams(array $query)
+    public function withQueryParams(array $query): static
     {
         $clone = clone $this;
         $clone->queryParams = $query;
@@ -216,7 +193,7 @@ class ServerRequest extends Request implements ServerRequestInterface
      * @return array An array tree of UploadedFileInterface instances; an empty
      *     array MUST be returned if no data is present.
      */
-    public function getUploadedFiles()
+    public function getUploadedFiles(): array
     {
         return $this->uploadedFiles ?? [];
     }
@@ -231,9 +208,9 @@ class ServerRequest extends Request implements ServerRequestInterface
      * @param array $uploadedFiles An array tree of UploadedFileInterface instances.
      *
      * @return static
-     * @throws \InvalidArgumentException if an invalid structure is provided.
+     * @throws InvalidArgumentException if an invalid structure is provided.
      */
-    public function withUploadedFiles(array $uploadedFiles)
+    public function withUploadedFiles(array $uploadedFiles): static
     {
         $clone = clone $this;
         $clone->uploadedFiles = $uploadedFiles;
@@ -252,7 +229,7 @@ class ServerRequest extends Request implements ServerRequestInterface
      *
      * @return array Attributes derived from the request.
      */
-    public function getAttributes()
+    public function getAttributes(): array
     {
         return $this->attributes ?? [];
     }
@@ -270,7 +247,7 @@ class ServerRequest extends Request implements ServerRequestInterface
      * @see getAttributes()
      *
      */
-    public function withAttributes(array $attributes)
+    public function withAttributes(array $attributes): static
     {
         $clone = clone $this;
         $clone->attributes = $attributes;
@@ -295,7 +272,7 @@ class ServerRequest extends Request implements ServerRequestInterface
      * @see getAttributes()
      *
      */
-    public function getAttribute($name, $default = null)
+    public function getAttribute($name, $default = null): mixed
     {
         return $this->attributes[$name] ?? $default ?? null;
     }
@@ -317,7 +294,7 @@ class ServerRequest extends Request implements ServerRequestInterface
      * @see getAttributes()
      *
      */
-    public function withAttribute($name, $value)
+    public function withAttribute($name, $value): static
     {
         $clone = clone $this;
         $clone->attributes[$name] = $value;
@@ -341,7 +318,7 @@ class ServerRequest extends Request implements ServerRequestInterface
      * @see getAttributes()
      *
      */
-    public function withoutAttribute($name)
+    public function withoutAttribute($name): static
     {
         $clone = clone $this;
         unset($clone->attributes[$name]);
@@ -354,7 +331,7 @@ class ServerRequest extends Request implements ServerRequestInterface
      *
      * @return bool
      */
-    public function isAjaxRequest()
+    public function isAjaxRequest(): bool
     {
         if ($this->hasHeader('AjaxRequest')) {
             return true;

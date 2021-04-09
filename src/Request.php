@@ -1,9 +1,9 @@
 <?php
-/**
+/*
  * This file is part of Berlioz framework.
  *
  * @license   https://opensource.org/licenses/MIT MIT License
- * @copyright 2017 Ronan GIRON
+ * @copyright 2021 Ronan GIRON
  * @author    Ronan GIRON <https://github.com/ElGigi>
  *
  * For the full copyright and license information, please view the LICENSE
@@ -14,13 +14,13 @@ declare(strict_types=1);
 
 namespace Berlioz\Http\Message;
 
+use InvalidArgumentException;
 use Psr\Http\Message\RequestInterface;
+use Psr\Http\Message\StreamInterface;
 use Psr\Http\Message\UriInterface;
 
 /**
  * Class Request.
- *
- * @package Berlioz\Http\Message
  */
 class Request extends Message implements RequestInterface
 {
@@ -34,25 +34,26 @@ class Request extends Message implements RequestInterface
     const HTTP_METHOD_TRACE = 'TRACE';
     const HTTP_METHOD_PUT = 'PUT';
     const HTTP_METHOD_DELETE = 'DELETE';
-    /** @var string Method */
-    protected $method;
-    /** @var \Psr\Http\Message\UriInterface Uri */
-    protected $uri;
-    /** @var string Request target */
-    protected $requestTarget;
 
     /**
      * Request constructor.
      *
      * @param string $method
-     * @param \Psr\Http\Message\UriInterface $uri
+     * @param UriInterface $uri
+     * @param StreamInterface|null $body
+     * @param array $headers
      * @param string|null $requestTarget
      */
-    public function __construct(string $method, UriInterface $uri, string $requestTarget = null)
-    {
-        $this->method = strtoupper($method);
-        $this->uri = $uri;
-        $this->requestTarget = $requestTarget;
+    public function __construct(
+        protected string $method,
+        protected UriInterface $uri,
+        mixed $body = null,
+        array $headers = [],
+        protected ?string $requestTarget = null
+    ) {
+        $this->method = strtoupper($this->method);
+
+        parent::__construct($body, $headers);
     }
 
     /**
@@ -71,14 +72,13 @@ class Request extends Message implements RequestInterface
      *
      * @return string
      */
-    public function getRequestTarget()
+    public function getRequestTarget(): string
     {
         if (!empty($this->requestTarget)) {
             return $this->requestTarget;
         }
 
-        $this->requestTarget = '';
-        $this->requestTarget .= $this->getUri()->getPath() ?? '/';
+        $this->requestTarget = $this->getUri()->getPath() ?? '/';
 
         $query = $this->getUri()->getQuery();
         if (!empty($query)) {
@@ -107,7 +107,7 @@ class Request extends Message implements RequestInterface
      *
      * @return static
      */
-    public function withRequestTarget($requestTarget)
+    public function withRequestTarget($requestTarget): static
     {
         $clone = clone $this;
         $clone->requestTarget = $requestTarget;
@@ -120,7 +120,7 @@ class Request extends Message implements RequestInterface
      *
      * @return string Returns the request method.
      */
-    public function getMethod()
+    public function getMethod(): string
     {
         return $this->method;
     }
@@ -139,9 +139,9 @@ class Request extends Message implements RequestInterface
      * @param string $method Case-sensitive method.
      *
      * @return static
-     * @throws \InvalidArgumentException for invalid HTTP methods.
+     * @throws InvalidArgumentException for invalid HTTP methods.
      */
-    public function withMethod($method)
+    public function withMethod($method): static
     {
         $clone = clone $this;
         $clone->method = strtoupper($method);
@@ -158,7 +158,7 @@ class Request extends Message implements RequestInterface
      * @return UriInterface Returns a UriInterface instance
      *     representing the URI of the request.
      */
-    public function getUri()
+    public function getUri(): UriInterface
     {
         return $this->uri;
     }
@@ -195,7 +195,7 @@ class Request extends Message implements RequestInterface
      *
      * @return static
      */
-    public function withUri(UriInterface $uri, $preserveHost = false)
+    public function withUri(UriInterface $uri, $preserveHost = false): static
     {
         $clone = clone $this;
         $clone->uri = $uri;

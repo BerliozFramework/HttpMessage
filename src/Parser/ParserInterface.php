@@ -1,9 +1,9 @@
 <?php
-/**
+/*
  * This file is part of Berlioz framework.
  *
  * @license   https://opensource.org/licenses/MIT MIT License
- * @copyright 2017 Ronan GIRON
+ * @copyright 2021 Ronan GIRON
  * @author    Ronan GIRON <https://github.com/ElGigi>
  *
  * For the full copyright and license information, please view the LICENSE
@@ -15,20 +15,20 @@ declare(strict_types=1);
 namespace Berlioz\Http\Message\Parser;
 
 use Psr\Http\Message\MessageInterface;
+use RuntimeException;
 
 /**
  * Interface ParserInterface.
- *
- * @package Berlioz\Http\Message\Parser
  */
 interface ParserInterface
 {
     /**
      * Parse message.
      *
-     * @param \Psr\Http\Message\MessageInterface $message
+     * @param MessageInterface $message
      *
-     * @return null|array|object
+     * @return mixed
+     * @throws RuntimeException If contents cannot be parsed.
      */
-    public static function parseMessageBody(MessageInterface $message);
+    public static function parseMessageBody(MessageInterface $message): mixed;
 }

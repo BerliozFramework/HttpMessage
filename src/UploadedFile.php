@@ -1,11 +1,10 @@
 <?php
-/**
+/*
  * This file is part of Berlioz framework.
  *
  * @license   https://opensource.org/licenses/MIT MIT License
- * @copyright 2017 Ronan GIRON
+ * @copyright 2021 Ronan GIRON
  * @author    Ronan GIRON <https://github.com/ElGigi>
- * @author    Yohann Lorant <https://github.com/ylorant>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code, to the root.
@@ -22,25 +21,11 @@ use RuntimeException;
 
 /**
  * Class UploadedFile.
- *
- * @package Berlioz\Http\Message
  */
 class UploadedFile implements UploadedFileInterface
 {
-    /** @var string File */
-    protected $file;
-    /** @var string Name of file */
-    protected $name;
-    /** @var string Mime type of file */
-    protected $type;
-    /** @var int Size of file */
-    protected $size;
-    /** @var int PHP UPLOAD_ERR_xxx error code */
-    protected $error;
-    /** @var bool If file has already moved */
-    protected $moved = false;
-    /** @var \Berlioz\Http\Message\Stream Stream of uploaded file */
-    private $stream;
+    protected bool $moved = false;
+    private ?StreamInterface $stream = null;
 
     /**
      * Parse uploaded files from $_FILES PHP environment variable
@@ -52,7 +37,7 @@ class UploadedFile implements UploadedFileInterface
     public static function parseUploadedFiles(array $uploadedFiles): array
     {
         if (!function_exists(__NAMESPACE__ . '\createUploadedFileObj')) {
-            function createUploadedFileObj($array)
+            function createUploadedFileObj(array $array): UploadedFile|array
             {
                 $result = [];
 
@@ -99,7 +84,7 @@ class UploadedFile implements UploadedFileInterface
      * @author Bart Kelsey <http://www.opengameart.org>
      * @see    https://stackoverflow.com/questions/5444827/how-do-you-loop-through-files-array/29664753#29664753
      */
-    public static function sanitizeFileData($files)
+    public static function sanitizeFileData(array $files): array
     {
         $result = [];
 
@@ -128,12 +113,10 @@ class UploadedFile implements UploadedFileInterface
      * @param array $keys
      * @param mixed $value
      *
-     * @return void
-     *
      * @author Bart Kelsey <http://www.opengameart.org>
      * @see    https://stackoverflow.com/questions/5444827/how-do-you-loop-through-files-array/29664753#29664753
      */
-    public static function filesFlip(&$result, $keys, $value)
+    public static function filesFlip(array &$result, array $keys, mixed $value): void
     {
         if (is_array($value)) {
             foreach ($value as $k => $v) {
@@ -161,18 +144,18 @@ class UploadedFile implements UploadedFileInterface
      * UploadedFile constructor
      *
      * @param string $file File
-     * @param string $name Client name of file
-     * @param string $type Client type of file
-     * @param int $size Size
+     * @param string|null $name Client name of file
+     * @param string|null $type Client type of file
+     * @param int|null $size Size
      * @param int $error PHP error code
      */
-    public function __construct(string $file, ?string $name, ?string $type, ?int $size, int $error)
-    {
-        $this->file = $file;
-        $this->name = $name;
-        $this->type = $type;
-        $this->size = $size;
-        $this->error = $error;
+    public function __construct(
+        protected string $file,
+        protected ?string $name,
+        protected ?string $type,
+        protected ?int $size,
+        protected int $error
+    ) {
     }
 
     /**
@@ -180,7 +163,7 @@ class UploadedFile implements UploadedFileInterface
      *
      * @return bool
      */
-    public function hasMoved()
+    public function hasMoved(): bool
     {
         return $this->moved;
     }
@@ -208,10 +191,10 @@ class UploadedFile implements UploadedFileInterface
      * an exception.
      *
      * @return StreamInterface Stream representation of the uploaded file.
-     * @throws \RuntimeException in cases when no stream is available or can be
+     * @throws RuntimeException in cases when no stream is available or can be
      *     created.
      */
-    public function getStream()
+    public function getStream(): StreamInterface
     {
         if ($this->hasMoved()) {
             throw new RuntimeException(sprintf('Uploaded file "%s" has already moved', $this->file));
@@ -227,9 +210,9 @@ class UploadedFile implements UploadedFileInterface
     /**
      * Set stream of uploaded file.
      *
-     * @param \Psr\Http\Message\StreamInterface $stream
+     * @param StreamInterface $stream
      *
-     * @return \Berlioz\Http\Message\UploadedFile
+     * @return UploadedFile
      */
     public function setStream(StreamInterface $stream): UploadedFile
     {
@@ -272,11 +255,11 @@ class UploadedFile implements UploadedFileInterface
      *
      * @param string $targetPath Path to which to move the uploaded file.
      *
-     * @throws \InvalidArgumentException if the $targetPath specified is invalid.
-     * @throws \RuntimeException on any error during the move operation, or on
+     * @throws InvalidArgumentException if the $targetPath specified is invalid.
+     * @throws RuntimeException on any error during the move operation, or on
      *     the second or subsequent call to the method.
      */
-    public function moveTo($targetPath)
+    public function moveTo($targetPath): void
     {
         if ($this->hasMoved()) {
             throw new RuntimeException(sprintf('Uploaded file "%s" has already moved', $this->file));
@@ -310,7 +293,7 @@ class UploadedFile implements UploadedFileInterface
      *
      * @return int|null The file size in bytes or null if unknown.
      */
-    public function getSize()
+    public function getSize(): ?int
     {
         return $this->size;
     }
@@ -321,11 +304,11 @@ class UploadedFile implements UploadedFileInterface
      * @param string $algo Name of selected hashing algorithm (i.e. "md5", "sha256", "haval160,4", etc..)
      *
      * @return string
-     * @throws \RuntimeException on any error during the hash operation.
+     * @throws RuntimeException on any error during the hash operation.
      *
      * @see \hash_file()
      */
-    public function getHash($algo = 'sha1')
+    public function getHash($algo = 'sha1'): string
     {
         if ($this->hasMoved()) {
             throw new RuntimeException(sprintf('Uploaded file "%s" has already moved', $this->file));
@@ -338,9 +321,9 @@ class UploadedFile implements UploadedFileInterface
      * Retrieve the media type of file.
      *
      * @return string|null The media type or null if unavailable
-     * @throws \RuntimeException on any error during the mime extraction operation.
+     * @throws RuntimeException on any error during the mime extraction operation.
      */
-    public function getMediaType()
+    public function getMediaType(): ?string
     {
         if ($this->error !== UPLOAD_ERR_OK) {
             return null;
@@ -364,9 +347,8 @@ class UploadedFile implements UploadedFileInterface
         finfo_close($finfo);
 
         $mime = explode(";", $mime);
-        $mime = trim($mime[0]);
 
-        return $mime;
+        return trim($mime[0]);
     }
 
     /**
@@ -383,7 +365,7 @@ class UploadedFile implements UploadedFileInterface
      * @see http://php.net/manual/en/features.file-upload.errors.php
      * @return int One of PHP's UPLOAD_ERR_XXX constants.
      */
-    public function getError()
+    public function getError(): int
     {
         return $this->error;
     }
@@ -401,7 +383,7 @@ class UploadedFile implements UploadedFileInterface
      * @return string|null The filename sent by the client or null if none
      *     was provided.
      */
-    public function getClientFilename()
+    public function getClientFilename(): ?string
     {
         return $this->name;
     }
@@ -419,7 +401,7 @@ class UploadedFile implements UploadedFileInterface
      * @return string|null The media type sent by the client or null if none
      *     was provided.
      */
-    public function getClientMediaType()
+    public function getClientMediaType(): ?string
     {
         return $this->type;
     }

@@ -1,9 +1,9 @@
 <?php
-/**
+/*
  * This file is part of Berlioz framework.
  *
  * @license   https://opensource.org/licenses/MIT MIT License
- * @copyright 2017 Ronan GIRON
+ * @copyright 2021 Ronan GIRON
  * @author    Ronan GIRON <https://github.com/ElGigi>
  *
  * For the full copyright and license information, please view the LICENSE
@@ -20,8 +20,6 @@ use RuntimeException;
 
 /**
  * Class Stream.
- *
- * @package Berlioz\Http\Message
  */
 class Stream implements StreamInterface
 {
@@ -33,7 +31,7 @@ class Stream implements StreamInterface
      *
      * @param resource $fp
      *
-     * @throws \RuntimeException If parameter isn't a resource or null value
+     * @throws RuntimeException If parameter isn't a resource or null value
      */
     public function __construct($fp = null)
     {
@@ -62,7 +60,7 @@ class Stream implements StreamInterface
      * @see http://php.net/manual/en/language.oop5.magic.php#object.tostring
      * @return string
      */
-    public function __toString()
+    public function __toString(): string
     {
         if (!is_resource($this->fp)) {
             return '';
@@ -70,7 +68,7 @@ class Stream implements StreamInterface
 
         try {
             return $this->getContents();
-        } catch (Exception $e) {
+        } catch (Exception) {
             return '';
         }
     }
@@ -80,7 +78,7 @@ class Stream implements StreamInterface
      *
      * @return void
      */
-    public function close()
+    public function close(): void
     {
         if (is_resource($this->fp)) {
             fclose($this->fp);
@@ -107,7 +105,7 @@ class Stream implements StreamInterface
      *
      * @return int|null Returns the size in bytes if known, or null if unknown.
      */
-    public function getSize()
+    public function getSize(): ?int
     {
         if (!is_resource($this->fp)) {
             return null;
@@ -126,9 +124,9 @@ class Stream implements StreamInterface
      * Returns the current position of the file read/write pointer
      *
      * @return int Position of the file pointer
-     * @throws \RuntimeException on error.
+     * @throws RuntimeException on error.
      */
-    public function tell()
+    public function tell(): int
     {
         if (!is_resource($this->fp) || ($position = ftell($this->fp)) === false) {
             throw new RuntimeException('Unable to get position of pointer in stream');
@@ -142,7 +140,7 @@ class Stream implements StreamInterface
      *
      * @return bool
      */
-    public function eof()
+    public function eof(): bool
     {
         if (!is_resource($this->fp)) {
             return false;
@@ -156,7 +154,7 @@ class Stream implements StreamInterface
      *
      * @return bool
      */
-    public function isSeekable()
+    public function isSeekable(): bool
     {
         return is_resource($this->fp);
     }
@@ -173,9 +171,9 @@ class Stream implements StreamInterface
      *                    offset bytes SEEK_CUR: Set position to current location plus offset
      *                    SEEK_END: Set position to end-of-stream plus offset.
      *
-     * @throws \RuntimeException on failure.
+     * @throws RuntimeException on failure.
      */
-    public function seek($offset, $whence = SEEK_SET)
+    public function seek($offset, $whence = SEEK_SET): void
     {
         if (!is_resource($this->fp) || fseek($this->fp, $offset, $whence) == -1) {
             throw new RuntimeException('Unable to seek stream');
@@ -188,11 +186,11 @@ class Stream implements StreamInterface
      * If the stream is not seekable, this method will raise an exception;
      * otherwise, it will perform a seek(0).
      *
-     * @throws \RuntimeException on failure.
+     * @throws RuntimeException on failure.
      * @link http://www.php.net/manual/en/function.fseek.php
      * @see  seek()
      */
-    public function rewind()
+    public function rewind(): void
     {
         if (!is_resource($this->fp) || rewind($this->fp) === false) {
             throw new RuntimeException('Unable to rewind stream');
@@ -204,7 +202,7 @@ class Stream implements StreamInterface
      *
      * @return bool
      */
-    public function isWritable()
+    public function isWritable(): bool
     {
         if (null === ($mode = $this->getMetadata('mode'))) {
             return false;
@@ -219,9 +217,9 @@ class Stream implements StreamInterface
      * @param string $string The string that is to be written.
      *
      * @return int Returns the number of bytes written to the stream.
-     * @throws \RuntimeException on failure.
+     * @throws RuntimeException on failure.
      */
-    public function write($string)
+    public function write($string): int
     {
         $length = strlen($string);
 
@@ -237,7 +235,7 @@ class Stream implements StreamInterface
      *
      * @return bool
      */
-    public function isReadable()
+    public function isReadable(): bool
     {
         if (!is_resource($this->fp) || null === ($mode = $this->getMetadata('mode'))) {
             return false;
@@ -261,9 +259,9 @@ class Stream implements StreamInterface
      *
      * @return string Returns the data read from the stream, or an empty string
      *     if no bytes are available.
-     * @throws \RuntimeException if an error occurs.
+     * @throws RuntimeException if an error occurs.
      */
-    public function read($length)
+    public function read($length): string
     {
         if (!$this->isReadable() || ($data = fread($this->fp, $length)) === false) {
             throw new RuntimeException('Unable to read stream');
@@ -276,10 +274,9 @@ class Stream implements StreamInterface
      * Returns the remaining contents in a string
      *
      * @return string
-     * @throws \RuntimeException if unable to read or an error occurs while
-     *     reading.
+     * @throws RuntimeException if unable to read or an error occurs while reading.
      */
-    public function getContents()
+    public function getContents(): string
     {
         if (!$this->isReadable() || ($contents = stream_get_contents($this->fp, -1, 0)) === false) {
             throw new RuntimeException('Unable to get contents of stream');
@@ -302,18 +299,18 @@ class Stream implements StreamInterface
      *     provided. Returns a specific key value if a key is provided and the
      *     value is found, or null if the key is not found.
      */
-    public function getMetadata($key = null)
+    public function getMetadata($key = null): mixed
     {
         $metas = stream_get_meta_data($this->fp);
 
-        if (null !== $key) {
-            if (isset($metas[$key])) {
-                return $metas[$key];
-            }
-
-            return null;
+        if (null === $key) {
+            return $metas;
         }
 
-        return $metas;
+        if (isset($metas[$key])) {
+            return $metas[$key];
+        }
+
+        return null;
     }
 }

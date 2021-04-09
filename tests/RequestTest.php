@@ -1,8 +1,19 @@
 <?php
+/*
+ * This file is part of Berlioz framework.
+ *
+ * @license   https://opensource.org/licenses/MIT MIT License
+ * @copyright 2021 Ronan GIRON
+ * @author    Ronan GIRON <https://github.com/ElGigi>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code, to the root.
+ */
 
 namespace Berlioz\Http\Message\Tests;
 
 use Berlioz\Http\Message\Request;
+use Berlioz\Http\Message\Stream;
 use Berlioz\Http\Message\Uri;
 use PHPUnit\Framework\TestCase;
 
@@ -11,29 +22,48 @@ class RequestTest extends TestCase
     public function requestDataProvider()
     {
         return [// Default values
-                [new Request('get',
-                             new Uri('http',
-                                     'getberlioz.com',
-                                     null,
-                                     '/path/path/index.php')),
-                 ['method'        => 'GET',
-                  'requestTarget' => '/path/path/index.php']],
-                // Complete constructor
-                [new Request('post',
-                             new Uri('http',
-                                     'getberlioz.com',
-                                     null,
-                                     '/path/path/index.php'),
-                             '/path/index.php'),
-                 ['method'        => 'POST',
-                  'requestTarget' => '/path/index.php']]];
+            [
+                new Request(
+                    'get',
+                    new Uri(
+                        'http',
+                        'getberlioz.com',
+                        null,
+                        '/path/path/index.php'
+                    )
+                ),
+                [
+                    'method' => 'GET',
+                    'requestTarget' => '/path/path/index.php'
+                ]
+            ],
+            // Complete constructor
+            [
+                new Request(
+                    'post',
+                    new Uri(
+                        'http',
+                        'getberlioz.com',
+                        null,
+                        '/path/path/index.php'
+                    ),
+                    new Stream(),
+                    [],
+                    '/path/index.php'
+                ),
+                [
+                    'method' => 'POST',
+                    'requestTarget' => '/path/index.php'
+                ]
+            ]
+        ];
     }
 
     /**
      * Test constructor and getters.
      *
-     * @param \Berlioz\Http\Message\Request $request       Request
-     * @param array                         $requestValues Values to test
+     * @param \Berlioz\Http\Message\Request $request Request
+     * @param array $requestValues Values to test
      *
      * @dataProvider requestDataProvider
      */
@@ -46,15 +76,19 @@ class RequestTest extends TestCase
 
     private function getRequestToTest(): Request
     {
-        return new Request('get',
-                           new Uri('http',
-                                   'getberlioz.com',
-                                   null,
-                                   '/path/path/index.php',
-                                   'test=test&test2=test2',
-                                   'fragmentTest',
-                                   'elgigi',
-                                   'password'));
+        return new Request(
+            'get',
+            new Uri(
+                'http',
+                'getberlioz.com',
+                null,
+                '/path/path/index.php',
+                'test=test&test2=test2',
+                'fragmentTest',
+                'elgigi',
+                'password'
+            )
+        );
     }
 
     public function testWithRequestTarget()
@@ -77,10 +111,12 @@ class RequestTest extends TestCase
     {
         $request = $this->getRequestToTest();
         $uri = $request->getUri();
-        $uri2 = new Uri('http',
-                        'getberlioz.com',
-                        null,
-                        '/path/index.php');
+        $uri2 = new Uri(
+            'http',
+            'getberlioz.com',
+            null,
+            '/path/index.php'
+        );
         $request2 = $request->withUri($uri2);
         $this->assertNotEquals($request, $request2);
         $this->assertEquals($uri, $request->getUri());

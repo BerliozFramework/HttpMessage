@@ -1,10 +1,9 @@
 <?php
-
-/**
+/*
  * This file is part of Berlioz framework.
  *
  * @license   https://opensource.org/licenses/MIT MIT License
- * @copyright 2017 Ronan GIRON
+ * @copyright 2021 Ronan GIRON
  * @author    Ronan GIRON <https://github.com/ElGigi>
  *
  * For the full copyright and license information, please view the LICENSE
@@ -19,15 +18,13 @@ use Psr\Http\Message\MessageInterface;
 
 /**
  * Class FormUrlEncodedParser.
- *
- * @package Berlioz\Http\Message\Parser
  */
 class FormUrlEncodedParser implements ParserInterface
 {
     /**
      * @inheritDoc
      */
-    public static function parseMessageBody(MessageInterface $message)
+    public static function parseMessageBody(MessageInterface $message): array
     {
         $parsedBody = [];
         parse_str((string)$message->getBody(), $parsedBody);

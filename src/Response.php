@@ -1,9 +1,9 @@
 <?php
-/**
+/*
  * This file is part of Berlioz framework.
  *
  * @license   https://opensource.org/licenses/MIT MIT License
- * @copyright 2017 Ronan GIRON
+ * @copyright 2021 Ronan GIRON
  * @author    Ronan GIRON <https://github.com/ElGigi>
  *
  * For the full copyright and license information, please view the LICENSE
@@ -14,13 +14,12 @@ declare(strict_types=1);
 
 namespace Berlioz\Http\Message;
 
+use InvalidArgumentException;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\StreamInterface;
 
 /**
  * Class Response.
- *
- * @package Berlioz\Http\Message
  */
 class Response extends Message implements ResponseInterface
 {
@@ -200,38 +199,22 @@ class Response extends Message implements ResponseInterface
         self::HTTP_STATUS_INVALID_SSL_CERTIFICATE => 'Invalid SSL Certificate',
         self::HTTP_STATUS_RAILGUN_ERROR => 'Railgun Error',
     ];
-    /** @var int Status code */
-    protected $statusCode;
-    /** @var string Reason phrase */
-    protected $reasonPhrase;
 
     /**
      * Response constructor.
      *
-     * @param \Psr\Http\Message\StreamInterface|string|null $body Body
+     * @param mixed $body Body
      * @param int $statusCode Status code
      * @param array $headers Headers
      * @param string|null $reasonPhrase Reason phrase
      */
-    public function __construct($body = null, int $statusCode = 200, array $headers = [], ?string $reasonPhrase = '')
-    {
-        $this->body = new Stream;
-
-        if (null !== $body) {
-            if ($body instanceof StreamInterface) {
-                $this->body = $body;
-            }
-
-            if (is_scalar($body)) {
-                $this->body->write($body);
-            }
-        }
-
-        $this->statusCode = $statusCode;
-        $this->reasonPhrase = $reasonPhrase ?? '';
-
-        $this->headers = [];
-        $this->setHeaders($headers);
+    public function __construct(
+        mixed $body = null,
+        protected int $statusCode = 200,
+        array $headers = [],
+        protected ?string $reasonPhrase = null
+    ) {
+        parent::__construct($body, $headers);
     }
 
     /**
@@ -242,7 +225,7 @@ class Response extends Message implements ResponseInterface
      *
      * @return int Status code.
      */
-    public function getStatusCode()
+    public function getStatusCode(): int
     {
         return $this->statusCode;
     }
@@ -267,9 +250,9 @@ class Response extends Message implements ResponseInterface
      *                             use the defaults as suggested in the HTTP specification.
      *
      * @return static
-     * @throws \InvalidArgumentException For invalid status code arguments.
+     * @throws InvalidArgumentException For invalid status code arguments.
      */
-    public function withStatus($code, $reasonPhrase = '')
+    public function withStatus($code, $reasonPhrase = ''): static
     {
         $clone = clone $this;
         $clone->statusCode = $code;
@@ -291,7 +274,7 @@ class Response extends Message implements ResponseInterface
      * @link http://www.iana.org/assignments/http-status-codes/http-status-codes.xhtml
      * @return string Reason phrase; must return an empty string if none present.
      */
-    public function getReasonPhrase()
+    public function getReasonPhrase(): string
     {
         return $this->reasonPhrase ?: self::REASONS[$this->statusCode] ?? '';
     }

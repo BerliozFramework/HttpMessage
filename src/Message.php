@@ -1,9 +1,9 @@
 <?php
-/**
+/*
  * This file is part of Berlioz framework.
  *
  * @license   https://opensource.org/licenses/MIT MIT License
- * @copyright 2017 Ronan GIRON
+ * @copyright 2021 Ronan GIRON
  * @author    Ronan GIRON <https://github.com/ElGigi>
  *
  * For the full copyright and license information, please view the LICENSE
@@ -25,25 +25,59 @@ use RuntimeException;
 
 /**
  * Class Message.
- *
- * @package Berlioz\Http\Message
  */
 abstract class Message implements MessageInterface
 {
-    /** @var string Protocol version */
-    protected $protocolVersion;
-    /** @var string[][] Headers */
-    protected $headers;
-    /** @var \Psr\Http\Message\StreamInterface Body */
-    protected $body;
-    /** @var null|array|object Parsed body */
-    protected $parsedBody;
-    /** @var callable[] Body parser */
-    protected static $bodyParser = [
+    protected static array $bodyParser = [
         'application/json' => JsonParser::class,
         'application/x-www-form-urlencoded' => FormUrlEncodedParser::class,
         'multipart/form-data' => FormDataParser::class,
     ];
+    protected StreamInterface $body;
+    protected mixed $parsedBody = null;
+
+    public function __construct(
+        mixed $body,
+        protected array $headers = [],
+        protected ?string $protocolVersion = null,
+    ) {
+        $this->headers = $this->normalizeHeaders($this->headers);
+        $this->body = $this->createStream($body);
+    }
+
+    /**
+     * Create stream.
+     *
+     * @param mixed $body
+     *
+     * @return StreamInterface
+     * @throws InvalidArgumentException
+     */
+    private function createStream(mixed $body): StreamInterface
+    {
+        if ($body instanceof StreamInterface) {
+            return $body;
+        }
+
+        if (null === $body) {
+            return new Stream();
+        }
+
+        if (is_resource($body)) {
+            return new Stream($body);
+        }
+
+        if (!is_scalar($body)) {
+            throw new InvalidArgumentException(
+                sprintf('Body must be scalar type, actual "%s" type', get_debug_type($body))
+            );
+        }
+
+        $stream = new Stream();
+        $stream->write((string)$body);
+
+        return $stream;
+    }
 
     /**
      * Retrieves the HTTP protocol version as a string.
@@ -52,7 +86,7 @@ abstract class Message implements MessageInterface
      *
      * @return string HTTP protocol version.
      */
-    public function getProtocolVersion()
+    public function getProtocolVersion(): string
     {
         return $this->protocolVersion ?? '1.1';
     }
@@ -71,7 +105,7 @@ abstract class Message implements MessageInterface
      *
      * @return static
      */
-    public function withProtocolVersion($version)
+    public function withProtocolVersion($version): static
     {
         $clone = clone $this;
         $clone->protocolVersion = $version;
@@ -104,7 +138,7 @@ abstract class Message implements MessageInterface
      *     key MUST be a header name, and each value MUST be an array of strings
      *     for that header.
      */
-    public function getHeaders()
+    public function getHeaders(): array
     {
         return $this->headers ?? [];
     }
@@ -118,7 +152,7 @@ abstract class Message implements MessageInterface
      *     name using a case-insensitive string comparison. Returns false if
      *     no matching header name is found in the message.
      */
-    public function hasHeader($name)
+    public function hasHeader($name): bool
     {
         $name = ucwords(strtolower($name), ' -_');
 
@@ -140,7 +174,7 @@ abstract class Message implements MessageInterface
      *    header. If the header does not appear in the message, this method MUST
      *    return an empty array.
      */
-    public function getHeader($name)
+    public function getHeader($name): array
     {
         $name = ucwords(strtolower($name), ' -_');
 
@@ -167,7 +201,7 @@ abstract class Message implements MessageInterface
      *    concatenated together using a comma. If the header does not appear in
      *    the message, this method MUST return an empty string.
      */
-    public function getHeaderLine($name)
+    public function getHeaderLine($name): string
     {
         $name = ucwords(strtolower($name), ' -_');
 
@@ -188,9 +222,9 @@ abstract class Message implements MessageInterface
      * @param string|string[] $value Header value(s).
      *
      * @return static
-     * @throws \InvalidArgumentException for invalid header names or values.
+     * @throws InvalidArgumentException for invalid header names or values.
      */
-    public function withHeader($name, $value)
+    public function withHeader($name, $value): static
     {
         return $this->withHeaders([$name => $value]);
     }
@@ -205,10 +239,10 @@ abstract class Message implements MessageInterface
      *
      * @return static
      */
-    public function withHeaders(array $headers)
+    public function withHeaders(array $headers): static
     {
         $clone = clone $this;
-        $clone->setHeaders($headers);
+        $clone->headers = $this->normalizeHeaders($headers);
 
         return $clone;
     }
@@ -218,16 +252,18 @@ abstract class Message implements MessageInterface
      *
      * @param string[] $headers Headers.
      *
-     * @return static
+     * @return array
      */
-    protected function setHeaders(array $headers): MessageInterface
+    protected function normalizeHeaders(array $headers): array
     {
+        $final = [];
+
         foreach ($headers as $name => $value) {
             $name = ucwords(strtolower($name), ' -_');
-            $this->headers[$name] = (array)$value;
+            $final[$name] = (array)$value;
         }
 
-        return $this;
+        return $final;
     }
 
     /**
@@ -245,9 +281,9 @@ abstract class Message implements MessageInterface
      * @param string|string[] $value Header value(s).
      *
      * @return static
-     * @throws \InvalidArgumentException for invalid header names or values.
+     * @throws InvalidArgumentException for invalid header names or values.
      */
-    public function withAddedHeader($name, $value)
+    public function withAddedHeader($name, $value): static
     {
         $clone = clone $this;
         $name = ucwords(strtolower($name), ' -_');
@@ -269,7 +305,7 @@ abstract class Message implements MessageInterface
      *
      * @return static
      */
-    public function withoutHeader($name)
+    public function withoutHeader($name): static
     {
         $clone = clone $this;
         $name = ucwords(strtolower($name), ' -_');
@@ -283,7 +319,7 @@ abstract class Message implements MessageInterface
      *
      * @return StreamInterface Returns the body as a stream.
      */
-    public function getBody()
+    public function getBody(): StreamInterface
     {
         if (null === $this->body) {
             $this->body = new Stream();
@@ -304,9 +340,9 @@ abstract class Message implements MessageInterface
      * @param StreamInterface $body Body.
      *
      * @return static
-     * @throws \InvalidArgumentException When the body is not valid.
+     * @throws InvalidArgumentException When the body is not valid.
      */
-    public function withBody(StreamInterface $body)
+    public function withBody(StreamInterface $body): static
     {
         $clone = clone $this;
         $clone->body = $body;
@@ -327,10 +363,10 @@ abstract class Message implements MessageInterface
      * potential types MUST be arrays or objects only. A null value indicates
      * the absence of body content.
      *
-     * @return null|array|object The deserialized body parameters, if any.
-     *     These will typically be an array or object.
+     * @return mixed The deserialized body parameters, if any.
+     *               These will typically be an array or object.
      */
-    public function getParsedBody()
+    public function getParsedBody(): mixed
     {
         if ($this->parsedBody) {
             return $this->parsedBody;
@@ -387,10 +423,9 @@ abstract class Message implements MessageInterface
      *                                typically be in an array or object.
      *
      * @return static
-     * @throws \InvalidArgumentException if an unsupported argument type is
-     *     provided.
+     * @throws InvalidArgumentException if an unsupported argument type is provided.
      */
-    public function withParsedBody($data)
+    public function withParsedBody($data): static
     {
         $clone = clone $this;
         $clone->parsedBody = $data;
@@ -411,12 +446,12 @@ abstract class Message implements MessageInterface
     /**
      * Add body parser.
      *
-     * @param string|string[] $mime Body parser
+     * @param array|string $mime Body parser
      * @param string $parserClass Parser class
      *
-     * @throws \InvalidArgumentException
+     * @throws InvalidArgumentException
      */
-    public static function addBodyParser($mime, string $parserClass)
+    public static function addBodyParser(array|string $mime, string $parserClass): void
     {
         if (!is_a($parserClass, ParserInterface::class, true)) {
             throw new InvalidArgumentException(
