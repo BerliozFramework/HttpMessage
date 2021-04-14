@@ -35,23 +35,30 @@ class Request extends Message implements RequestInterface
     const HTTP_METHOD_PUT = 'PUT';
     const HTTP_METHOD_DELETE = 'DELETE';
 
+    protected UriInterface $uri;
+
     /**
      * Request constructor.
      *
      * @param string $method
-     * @param UriInterface $uri
+     * @param UriInterface|string $uri
      * @param StreamInterface|null $body
      * @param array $headers
      * @param string|null $requestTarget
      */
     public function __construct(
         protected string $method,
-        protected UriInterface $uri,
+        UriInterface|string $uri,
         mixed $body = null,
         array $headers = [],
         protected ?string $requestTarget = null
     ) {
         $this->method = strtoupper($this->method);
+
+        if (is_string($uri)) {
+            $uri = Uri::createFromString($uri);
+        }
+        $this->uri = $uri;
 
         parent::__construct($body, $headers);
     }

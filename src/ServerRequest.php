@@ -27,11 +27,11 @@ class ServerRequest extends Request implements ServerRequestInterface
     private ?array $queryParams = null;
 
     public function __construct(
-        $method,
-        UriInterface $uri,
-        array $headers,
-        protected array $cookies,
-        protected array $serverParams,
+        string $method,
+        UriInterface|string $uri,
+        array $headers = [],
+        protected array $cookies = [],
+        protected array $serverParams = [],
         mixed $body = null,
         protected array $uploadedFiles = [],
         protected array $attributes = []

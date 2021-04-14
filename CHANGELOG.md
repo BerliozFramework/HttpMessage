@@ -15,6 +15,7 @@ use [Keep a Changelog] (http://keepachangelog.com/).
 
 - Bump minimum compatibility to PHP 8
 - Signature of `\Berlioz\Http\Message\Request` constructor
+- Signature of `\Berlioz\Http\Message\ServerRequest` constructor
 - `body` parameter in constructors is now of mixed type
 
 ## [1.2.0] - 2020-11-05
