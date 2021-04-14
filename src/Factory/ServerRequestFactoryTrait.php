@@ -123,7 +123,7 @@ trait ServerRequestFactoryTrait
         $requestUri = new Uri(
             $_SERVER['REQUEST_SCHEME'] ?? '',
             $_SERVER['HTTP_HOST'] ?? '',
-            $_SERVER['SERVER_PORT'] ?? ($_SERVER['REQUEST_SCHEME'] == 'https' ? 443 : 80),
+            (int)($_SERVER['SERVER_PORT'] ?? ($_SERVER['REQUEST_SCHEME'] == 'https' ? 443 : 80)),
             $path,
             $queryString,
             '',
