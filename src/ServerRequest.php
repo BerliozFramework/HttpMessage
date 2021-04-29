@@ -16,7 +16,6 @@ namespace Berlioz\Http\Message;
 
 use InvalidArgumentException;
 use Psr\Http\Message\ServerRequestInterface;
-use Psr\Http\Message\StreamInterface;
 use Psr\Http\Message\UriInterface;
 
 /**
@@ -337,7 +336,7 @@ class ServerRequest extends Request implements ServerRequestInterface
             return true;
         }
 
-        if ($this->getServerParam('HTTP_X_REQUESTED_WITH', '') == 'xmlhttprequest') {
+        if ($this->getServerParam('HTTP_X_REQUESTED_WITH', '') == 'XMLHttpRequest') {
             return true;
         }
 

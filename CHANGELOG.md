@@ -10,6 +10,10 @@ use [Keep a Changelog] (http://keepachangelog.com/).
 
 - New `FileStream` class
 
+### Fixed
+
+- `ServerRequest::isAjaxRequest()` compare the lower case value of `X-Requested-With` header instead of sensitive case value
+
 ## [2.0.0-beta1] - 2021-04-14
 
 ### Added
