@@ -23,4 +23,12 @@ class MemoryStreamTest extends TestCase
 
         $this->assertInstanceOf(MemoryStream::class, $stream);
     }
+
+    public function testConstruct_withContents()
+    {
+        $stream = new MemoryStream('Foo bar');
+
+        $this->assertInstanceOf(MemoryStream::class, $stream);
+        $this->assertEquals('Foo bar', $stream->getContents());
+    }
 }

@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file. This projec
 to [Semantic Versioning] (http://semver.org/). For change log format,
 use [Keep a Changelog] (http://keepachangelog.com/).
 
+## [2.0.0-beta3] - In progress
+
+### Changed
+
+- `MemoryStream` accept initial contents in argument of constructor
+
 ## [2.0.0-beta2] - 2021-04-29
 
 ### Added
