@@ -242,7 +242,7 @@ abstract class Message implements MessageInterface
     public function withHeaders(array $headers): static
     {
         $clone = clone $this;
-        $clone->headers = $this->normalizeHeaders($headers);
+        $clone->headers = array_replace($clone->headers, $this->normalizeHeaders($headers));
 
         return $clone;
     }

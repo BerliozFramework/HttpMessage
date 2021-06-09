@@ -32,11 +32,13 @@ class MessageTest extends TestCase
         class extends Message {
             public function __construct()
             {
-                $this->headers = [
-                    'Content-Type' => ['application/json'],
-                    'X-Header-Test' => ['Test', 'Test2'],
-                ];
-                $this->body = new Stream();
+                parent::__construct(
+                    null,
+                    [
+                        'Content-Type' => ['application/json'],
+                        'X-Header-Test' => ['Test', 'Test2'],
+                    ]
+                );
             }
         };
     }
@@ -87,10 +89,28 @@ class MessageTest extends TestCase
         $message = $this->newMessageObj();
 
         $message2 = $message->withHeader('Accept', '*');
+
         $this->assertEquals(false, $message->hasHeader('Accept'));
         $this->assertEquals(['*'], $message2->getHeader('Accept'));
+        $this->assertEquals(
+            [
+                'Content-Type' => ['application/json'],
+                'X-Header-Test' => ['Test', 'Test2'],
+                'Accept' => ['*'],
+            ],
+            $message2->getHeaders()
+        );
+
         $message2 = $message->withHeader('Content-Type', 'text/html');
+
         $this->assertEquals(['text/html'], $message2->getHeader('Content-Type'));
+        $this->assertEquals(
+            [
+                'Content-Type' => ['text/html'],
+                'X-Header-Test' => ['Test', 'Test2'],
+            ],
+            $message2->getHeaders()
+        );
     }
 
     public function testWithAddedHeader()

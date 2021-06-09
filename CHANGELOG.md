@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file. This projec
 to [Semantic Versioning] (http://semver.org/). For change log format,
 use [Keep a Changelog] (http://keepachangelog.com/).
 
+## [2.0.0-beta4] - In progress
+
+### Fixed
+
+- `Berlioz\Http\Message\Message::withHeaders()` do not replace specified headers
+
 ## [2.0.0-beta3] - 2021-06-07
 
 ### Changed
