@@ -125,7 +125,9 @@ abstract class AbstractStream implements StreamInterface
     public function getContents(): string
     {
         $currentPosition = $this->tell();
-        $this->rewind();
+        if ($this->isSeekable()) {
+            $this->rewind();
+        }
         $contents = '';
 
         while (false === $this->eof()) {
@@ -133,7 +135,9 @@ abstract class AbstractStream implements StreamInterface
         }
 
         // Restore position
-        $this->seek($currentPosition);
+        if ($this->isSeekable()) {
+            $this->seek($currentPosition);
+        }
 
         return $contents;
     }

@@ -71,6 +71,10 @@ class GzStream extends AbstractStream
             return null;
         }
 
+        if (false === $this->isSeekable()) {
+            return null;
+        }
+
         $currentPosition = $this->tell();
         $this->rewind();
         $size = 0;
