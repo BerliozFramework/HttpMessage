@@ -30,6 +30,9 @@
     "phpunit/phpunit": "^9.3",
     "http-interop/http-factory-tests": "^0.7"
   },
+  "suggest": {
+    "ext-zlib": "To use GzStream"
+  },
   "provide": {
     "psr/http-message-implementation": "^1.0",
     "psr/http-factory-implementation": "^1.0"

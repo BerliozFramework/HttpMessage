@@ -10,17 +10,17 @@
  * file that was distributed with this source code, to the root.
  */
 
-namespace Berlioz\Http\Message\Tests;
+namespace Berlioz\Http\Message\Tests\Stream;
 
-use Berlioz\Http\Message\Stream;
+use Berlioz\Http\Message\Stream\GzStream;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
 
-class StreamTest extends TestCase
+class GzStreamTest extends TestCase
 {
     public function testEof()
     {
-        $stream = new Stream(fopen(__DIR__ . '/test.txt', 'r+'));
+        $stream = new GzStream(fopen(__DIR__ . '/../test.txt.gz', 'r+'));
         $this->assertFalse($stream->eof());
         $stream->read($stream->getSize() + 1);
         $this->assertTrue($stream->eof());
@@ -28,7 +28,7 @@ class StreamTest extends TestCase
 
     public function testRead()
     {
-        $stream = new Stream(fopen($file = __DIR__ . '/test.txt', 'r+'));
+        $stream = new GzStream(fopen($file = __DIR__ . '/../test.txt.gz', 'r+'));
 
         $this->assertEquals(
             substr(file_get_contents($file), 0, 5),
@@ -38,7 +38,7 @@ class StreamTest extends TestCase
 
     public function testWrite()
     {
-        $stream = new Stream(tmpfile());
+        $stream = new GzStream(tmpfile());
 
         $this->assertEquals(4, $stream->write('Test'));
         $this->assertEquals(4, $stream->getSize());
@@ -48,7 +48,7 @@ class StreamTest extends TestCase
 
     public function testWriteFail()
     {
-        $stream = new Stream(fopen(__DIR__ . '/test.txt', 'r'));
+        $stream = new GzStream(fopen(__DIR__ . '/../test.txt.gz', 'r'));
 
         $this->expectException(RuntimeException::class);
         $stream->write('Test');
@@ -56,13 +56,13 @@ class StreamTest extends TestCase
 
     public function testGetMetadata()
     {
-        $stream = new Stream($resource = fopen(__DIR__ . '/test.txt', 'r'));
+        $stream = new GzStream($resource = fopen(__DIR__ . '/../test.txt.gz', 'r'));
         $this->assertEquals(stream_get_meta_data($resource), $stream->getMetadata());
     }
 
     public function testContents()
     {
-        $stream = new Stream(fopen($file = __DIR__ . '/test.txt', 'r+'));
+        $stream = new GzStream(fopen($file = __DIR__ . '/../test.txt.gz', 'r+'));
 
         $this->assertEquals(file_get_contents($file), (string)$stream);
         $this->assertEquals(file_get_contents($file), $stream->getContents());
@@ -70,32 +70,32 @@ class StreamTest extends TestCase
 
     public function testIsWritable()
     {
-        $stream = new Stream(fopen(__DIR__ . '/test.txt', 'r'));
+        $stream = new GzStream(fopen(__DIR__ . '/../test.txt.gz', 'r'));
         $this->assertFalse($stream->isWritable());
 
-        $stream = new Stream(fopen(__DIR__ . '/test.txt', 'r+'));
+        $stream = new GzStream(fopen(__DIR__ . '/../test.txt.gz', 'r+'));
         $this->assertTrue($stream->isWritable());
     }
 
     public function testIsReadable()
     {
-        $stream = new Stream(fopen(__DIR__ . '/test.txt', 'a'));
+        $stream = new GzStream(fopen(__DIR__ . '/../test.txt.gz', 'a'));
         $this->assertFalse($stream->isReadable());
 
-        $stream = new Stream(fopen(__DIR__ . '/test.txt', 'a+'));
+        $stream = new GzStream(fopen(__DIR__ . '/../test.txt.gz', 'a+'));
         $this->assertTrue($stream->isReadable());
     }
 
     public function testClose()
     {
-        $stream = new Stream(fopen(__DIR__ . '/test.txt', 'r+'));
+        $stream = new GzStream(fopen(__DIR__ . '/../test.txt.gz', 'r+'));
         $stream->close();
         $this->assertFalse($stream->isSeekable());
     }
 
     public function testDetach()
     {
-        $stream = new Stream($resource = fopen(__DIR__ . '/test.txt', 'r+'));
+        $stream = new GzStream($resource = fopen(__DIR__ . '/../test.txt.gz', 'r+'));
         $detachedResource = $stream->detach();
 
         $this->assertFalse($stream->isSeekable());
@@ -104,7 +104,7 @@ class StreamTest extends TestCase
 
     public function testTellSeekRewind()
     {
-        $stream = new Stream($resource = fopen(__DIR__ . '/test.txt', 'r+'));
+        $stream = new GzStream($resource = fopen(__DIR__ . '/../test.txt.gz', 'r+'));
 
         $this->assertTrue($stream->isSeekable());
         $this->assertEquals(ftell($resource), $stream->tell());

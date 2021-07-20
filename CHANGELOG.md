@@ -6,6 +6,10 @@ use [Keep a Changelog] (http://keepachangelog.com/).
 
 ## [2.0.0-beta4] - In progress
 
+### Added
+
+- New `GzStream` class
+
 ### Fixed
 
 - `Berlioz\Http\Message\Message::withHeaders()` do not replace specified headers

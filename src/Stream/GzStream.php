@@ -12,16 +12,18 @@
 
 declare(strict_types=1);
 
-namespace Berlioz\Http\Message;
+namespace Berlioz\Http\Message\Stream;
 
-use Berlioz\Http\Message\Stream\AbstractStream;
 use RuntimeException;
 
 /**
- * Class Stream.
+ * Class GzStream.
  */
-class Stream extends AbstractStream
+class GzStream extends AbstractStream
 {
+    /** @var resource Stream */
+    protected $fp;
+
     /**
      * Stream constructor.
      *
@@ -31,6 +33,10 @@ class Stream extends AbstractStream
      */
     public function __construct($fp = null)
     {
+        if (false === extension_loaded('zlib')) {
+            throw new RuntimeException('Extension ZLIB required');
+        }
+
         if (null !== $fp && !is_resource($fp)) {
             throw new RuntimeException('Parameter must be a resource type or null value.');
         }
@@ -38,7 +44,7 @@ class Stream extends AbstractStream
         $this->fp = $fp;
 
         if (null === $fp) {
-            $this->fp = fopen('php://temp', 'r+');
+            $this->fp = gzopen('php://temp', 'r+');
         }
     }
 
@@ -50,7 +56,7 @@ class Stream extends AbstractStream
     public function close(): void
     {
         if (is_resource($this->fp)) {
-            fclose($this->fp);
+            gzclose($this->fp);
         }
     }
 
@@ -65,13 +71,18 @@ class Stream extends AbstractStream
             return null;
         }
 
-        $stats = fstat($this->fp);
+        $currentPosition = $this->tell();
+        $this->rewind();
+        $size = 0;
 
-        if (!isset($stats['size'])) {
-            return null;
+        while (false === $this->eof()) {
+            $size += strlen($this->read(4096));
         }
 
-        return $stats['size'];
+        // Restore position
+        $this->seek($currentPosition);
+
+        return $size;
     }
 
     /**
@@ -82,7 +93,7 @@ class Stream extends AbstractStream
      */
     public function tell(): int
     {
-        if (!is_resource($this->fp) || ($position = ftell($this->fp)) === false) {
+        if (!is_resource($this->fp) || ($position = gztell($this->fp)) === false) {
             throw new RuntimeException('Unable to get position of pointer in stream');
         }
 
@@ -100,7 +111,7 @@ class Stream extends AbstractStream
             return false;
         }
 
-        return feof($this->fp);
+        return gzeof($this->fp);
     }
 
     /**
@@ -119,7 +130,7 @@ class Stream extends AbstractStream
      */
     public function seek($offset, $whence = SEEK_SET): void
     {
-        if (!is_resource($this->fp) || fseek($this->fp, $offset, $whence) == -1) {
+        if (!is_resource($this->fp) || gzseek($this->fp, $offset, $whence) == -1) {
             throw new RuntimeException('Unable to seek stream');
         }
     }
@@ -136,7 +147,7 @@ class Stream extends AbstractStream
      */
     public function rewind(): void
     {
-        if (!is_resource($this->fp) || rewind($this->fp) === false) {
+        if (!is_resource($this->fp) || gzrewind($this->fp) === false) {
             throw new RuntimeException('Unable to rewind stream');
         }
     }
@@ -153,7 +164,7 @@ class Stream extends AbstractStream
     {
         $length = strlen($string);
 
-        if (($written = @fwrite($this->fp, $string)) === false || $written !== $length) {
+        if (($written = @gzwrite($this->fp, $string)) === false || $written !== $length) {
             throw new RuntimeException('Unable to write string to the stream');
         }
 
@@ -173,7 +184,7 @@ class Stream extends AbstractStream
      */
     public function read($length): string
     {
-        if (!$this->isReadable() || ($data = fread($this->fp, $length)) === false) {
+        if (!$this->isReadable() || ($data = gzread($this->fp, $length)) === false) {
             throw new RuntimeException('Unable to read stream');
         }
 
