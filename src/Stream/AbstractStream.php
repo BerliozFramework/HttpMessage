@@ -69,26 +69,6 @@ abstract class AbstractStream implements StreamInterface
     }
 
     /**
-     * Get the size of the stream if known.
-     *
-     * @return int|null Returns the size in bytes if known, or null if unknown.
-     */
-    public function getSize(): ?int
-    {
-        if (false === is_resource($this->fp)) {
-            return null;
-        }
-
-        $stats = fstat($this->fp);
-
-        if (!isset($stats['size'])) {
-            return null;
-        }
-
-        return $stats['size'];
-    }
-
-    /**
      * Returns whether or not the stream is seekable.
      *
      * @return bool
