@@ -44,7 +44,7 @@ class GzStream extends AbstractStream
         $this->fp = $fp;
 
         if (null === $fp) {
-            $this->fp = gzopen('php://temp', 'r+');
+            $this->fp = gzopen('php://temp', 'w');
         }
     }
 

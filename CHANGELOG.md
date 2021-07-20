@@ -8,6 +8,7 @@ use [Keep a Changelog] (http://keepachangelog.com/).
 
 ### Added
 
+- New `GzFileStream` class
 - New `GzStream` class
 
 ### Fixed

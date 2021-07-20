@@ -123,7 +123,7 @@ abstract class AbstractStream implements StreamInterface
      */
     public function isReadable(): bool
     {
-        if (false === is_resource($this->fp) || null === ($mode = $this->getMetadata('mode'))) {
+        if (null === ($mode = $this->getMetadata('mode'))) {
             return false;
         }
 
