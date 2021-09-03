@@ -2,7 +2,7 @@
 
 [![Latest Version](https://img.shields.io/packagist/v/berlioz/http-message.svg?style=flat-square)](https://github.com/BerliozFramework/HttpMessage/releases)
 [![Software license](https://img.shields.io/github/license/BerliozFramework/HttpMessage.svg?style=flat-square)](https://github.com/BerliozFramework/HttpMessage/blob/2.x/LICENSE)
-[![Build Status](https://img.shields.io/travis/com/BerliozFramework/HttpMessage/2.x.svg?style=flat-square)](https://travis-ci.com/BerliozFramework/HttpMessage)
+[![Build Status](https://img.shields.io/github/workflow/status/BerliozFramework/HttpMessage/Tests/2.x.svg?style=flat-square)](https://github.com/BerliozFramework/HttpMessage/actions/workflows/tests.yml?query=branch%3A2.x)
 [![Quality Grade](https://img.shields.io/codacy/grade/3175956ccec64633be9a057cf549faf2/2.x.svg?style=flat-square)](https://www.codacy.com/manual/BerliozFramework/HttpMessage)
 [![Total Downloads](https://img.shields.io/packagist/dt/berlioz/http-message.svg?style=flat-square)](https://packagist.org/packages/berlioz/http-message)
 
