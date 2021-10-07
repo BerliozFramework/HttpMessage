@@ -121,8 +121,32 @@ class MessageTest extends TestCase
     {
         $message = $this->newMessageObj();
 
-        $message2 = $message->withAddedHeader('Content-Type', 'text/html');
+        $message2 = $message
+            ->withAddedHeader('Content-Type', 'text/html')
+            ->withAddedHeader('X-Header-Numeric', 4321);
+
         $this->assertSame(['application/json', 'text/html'], $message2->getHeader('Content-Type'));
+        $this->assertSame(['1234', '4321'], $message2->getHeader('X-Header-Numeric'));
+        $this->assertSame(
+            [
+                'Content-Type' => ['application/json', 'text/html'],
+                'X-Header-Test' => ['Test', 'Test2'],
+                'X-Header-Numeric' => ['1234', '4321']
+            ],
+            $message2->getHeaders()
+        );
+    }
+
+    public function testWithAddedHeader_multiple()
+    {
+        $message = $this->newMessageObj();
+
+        $message2 = $message->withAddedHeader('Content-Type', ['text/xml', 'text/html', 1234]);
+
+        $this->assertSame(
+            ['application/json', 'text/xml', 'text/html', '1234'],
+            $message2->getHeader('Content-Type')
+        );
     }
 
     public function testWithoutHeader()

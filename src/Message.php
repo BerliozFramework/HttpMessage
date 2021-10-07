@@ -289,6 +289,8 @@ abstract class Message implements MessageInterface
     {
         $clone = clone $this;
         $name = ucwords(strtolower($name), ' -_');
+        $value = (array)$value;
+        array_walk_recursive($value, fn(&$value) => $value = (string)$value);
         $clone->headers[$name] = array_merge($clone->headers[$name] ?? [], (array)$value);
 
         return $clone;

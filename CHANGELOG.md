@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file. This projec
 to [Semantic Versioning] (http://semver.org/). For change log format,
 use [Keep a Changelog] (http://keepachangelog.com/).
 
+## [2.0.2] - 2021-10-07
+
+### Fixed
+
+- Cast header value to string with `Message::withAddedHeader()`
+
 ## [2.0.1] - 2021-10-07
 
 ### Fixed
