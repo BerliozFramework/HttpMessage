@@ -263,6 +263,8 @@ abstract class Message implements MessageInterface
             $final[$name] = (array)$value;
         }
 
+        array_walk_recursive($final, fn(&$value) => $value = (string)$value);
+
         return $final;
     }
 

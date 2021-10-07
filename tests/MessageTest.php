@@ -37,6 +37,7 @@ class MessageTest extends TestCase
                     [
                         'Content-Type' => ['application/json'],
                         'X-Header-Test' => ['Test', 'Test2'],
+                        'X-Header-Numeric' => 1234,
                     ]
                 );
             }
@@ -46,39 +47,40 @@ class MessageTest extends TestCase
     public function testProtocolVersion()
     {
         $message = $this->newMessageObj();
-        $this->assertEquals('1.1', $message->getProtocolVersion());
+        $this->assertSame('1.1', $message->getProtocolVersion());
 
         $message2 = $message->withProtocolVersion('1.0');
-        $this->assertEquals('1.1', $message->getProtocolVersion());
-        $this->assertEquals('1.0', $message2->getProtocolVersion());
+        $this->assertSame('1.1', $message->getProtocolVersion());
+        $this->assertSame('1.0', $message2->getProtocolVersion());
     }
 
     public function testHasHeader()
     {
         $message = $this->newMessageObj();
 
-        $this->assertEquals(true, $message->hasHeader('Content-Type'));
-        $this->assertEquals(true, $message->hasHeader('contENT-type'));
-        $this->assertEquals(true, $message->hasHeader('X-Header-Test'));
-        $this->assertEquals(false, $message->hasHeader('Accept'));
+        $this->assertSame(true, $message->hasHeader('Content-Type'));
+        $this->assertSame(true, $message->hasHeader('contENT-type'));
+        $this->assertSame(true, $message->hasHeader('X-Header-Test'));
+        $this->assertSame(false, $message->hasHeader('Accept'));
     }
 
     public function testGetHeader()
     {
         $message = $this->newMessageObj();
 
-        $this->assertEquals(['application/json'], $message->getHeader('Content-Type'));
-        $this->assertEquals(['Test', 'Test2'], $message->getHeader('X-Header-Test'));
+        $this->assertSame(['application/json'], $message->getHeader('Content-Type'));
+        $this->assertSame(['Test', 'Test2'], $message->getHeader('X-Header-Test'));
     }
 
     public function testGetHeaders()
     {
         $message = $this->newMessageObj();
 
-        $this->assertEquals(
+        $this->assertSame(
             [
                 'Content-Type' => ['application/json'],
                 'X-Header-Test' => ['Test', 'Test2'],
+                'X-Header-Numeric' => ['1234'],
             ],
             $message->getHeaders()
         );
@@ -90,12 +92,13 @@ class MessageTest extends TestCase
 
         $message2 = $message->withHeader('Accept', '*');
 
-        $this->assertEquals(false, $message->hasHeader('Accept'));
-        $this->assertEquals(['*'], $message2->getHeader('Accept'));
-        $this->assertEquals(
+        $this->assertSame(false, $message->hasHeader('Accept'));
+        $this->assertSame(['*'], $message2->getHeader('Accept'));
+        $this->assertSame(
             [
                 'Content-Type' => ['application/json'],
                 'X-Header-Test' => ['Test', 'Test2'],
+                'X-Header-Numeric' => ['1234'],
                 'Accept' => ['*'],
             ],
             $message2->getHeaders()
@@ -103,11 +106,12 @@ class MessageTest extends TestCase
 
         $message2 = $message->withHeader('Content-Type', 'text/html');
 
-        $this->assertEquals(['text/html'], $message2->getHeader('Content-Type'));
-        $this->assertEquals(
+        $this->assertSame(['text/html'], $message2->getHeader('Content-Type'));
+        $this->assertSame(
             [
                 'Content-Type' => ['text/html'],
                 'X-Header-Test' => ['Test', 'Test2'],
+                'X-Header-Numeric' => ['1234'],
             ],
             $message2->getHeaders()
         );
@@ -118,7 +122,7 @@ class MessageTest extends TestCase
         $message = $this->newMessageObj();
 
         $message2 = $message->withAddedHeader('Content-Type', 'text/html');
-        $this->assertEquals(['application/json', 'text/html'], $message2->getHeader('Content-Type'));
+        $this->assertSame(['application/json', 'text/html'], $message2->getHeader('Content-Type'));
     }
 
     public function testWithoutHeader()
@@ -126,15 +130,21 @@ class MessageTest extends TestCase
         $message = $this->newMessageObj();
 
         $message2 = $message->withoutHeader('X-Header-Test');
-        $this->assertEquals(['Content-Type' => ['application/json']], $message2->getHeaders());
+        $this->assertSame(
+            [
+                'Content-Type' => ['application/json'],
+                'X-Header-Numeric' => ['1234']
+            ],
+            $message2->getHeaders()
+        );
     }
 
     public function testGetHeaderLine()
     {
         $message = $this->newMessageObj();
 
-        $this->assertEquals('application/json', $message->getHeaderLine('Content-Type'));
-        $this->assertEquals('Test, Test2', $message->getHeaderLine('X-Header-Test'));
+        $this->assertSame('application/json', $message->getHeaderLine('Content-Type'));
+        $this->assertSame('Test, Test2', $message->getHeaderLine('X-Header-Test'));
     }
 
     public function testGetBody()
@@ -151,8 +161,8 @@ class MessageTest extends TestCase
         $stream = $message->getBody();
         $newStream = new Stream();
         $message2 = $message->withBody($newStream);
-        $this->assertEquals($stream, $message->getBody());
-        $this->assertEquals($newStream, $message2->getBody());
+        $this->assertSame($stream, $message->getBody());
+        $this->assertSame($newStream, $message2->getBody());
         $this->assertNotEquals($newStream, $message->getBody());
     }
 
@@ -195,7 +205,7 @@ class MessageTest extends TestCase
 
         $this->assertArrayHasKey('json', $message->getParsedBody());
         $this->assertArrayHasKey('application/json', $message::getBodyParsers());
-        $this->assertEquals(FakeParser::class, $message::getBodyParsers()['application/json']);
+        $this->assertSame(FakeParser::class, $message::getBodyParsers()['application/json']);
     }
 
     public function testAddBadParser()
