@@ -47,12 +47,42 @@ class Uri implements UriInterface
     }
 
     /**
-     * Create Uri object with string
+     * Create Uri.
+     *
+     * @param Uri|string $uri
+     * @param Uri|string|null $ref
+     *
+     * @return static
+     */
+    public static function create(Uri|string $uri, Uri|string|null $ref = null): static
+    {
+        is_string($uri) && $uri = static::createFromString($uri);
+
+        if (!empty($uri->getHost()) || null === $ref) {
+            return $uri;
+        }
+
+        is_string($ref) && $ref = static::createFromString($ref);
+        $userInfo = explode(':', $ref->getUserInfo(), 2);
+
+        return new static(
+            scheme: $ref->getScheme(),
+            host: $ref->getHost(),
+            port: $ref->getPort(),
+            path: b_resolve_absolute_path($ref->getPath() ?: '/', $uri->getPath() ?: '/'),
+            query: $uri->getQuery(),
+            fragment: $uri->getFragment(),
+            user: $userInfo[0] ?? '',
+            password: $userInfo[1] ?? '',
+        );
+    }
+
+    /**
+     * Create Uri with string
      *
      * @param string $str
      *
      * @return static
-     * @throws InvalidArgumentException If string cannot be parsed
      */
     public static function createFromString(string $str): static
     {
@@ -63,14 +93,14 @@ class Uri implements UriInterface
         }
 
         return new self(
-            $parsedUrl['scheme'] ?? '',
-            $parsedUrl['host'] ?? '',
-            $parsedUrl['port'] ?? null,
-            $parsedUrl['path'] ?? '/',
-            $parsedUrl['query'] ?? '',
-            $parsedUrl['fragment'] ?? '',
-            $parsedUrl['user'] ?? '',
-            $parsedUrl['pass'] ?? ''
+            scheme: $parsedUrl['scheme'] ?? '',
+            host: $parsedUrl['host'] ?? '',
+            port: $parsedUrl['port'] ?? null,
+            path: $parsedUrl['path'] ?? '/',
+            query: $parsedUrl['query'] ?? '',
+            fragment: $parsedUrl['fragment'] ?? '',
+            user: $parsedUrl['user'] ?? '',
+            password: $parsedUrl['pass'] ?? ''
         );
     }
 

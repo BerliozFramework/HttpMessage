@@ -20,58 +20,75 @@ class UriTest extends TestCase
     public function uriDataProvider()
     {
         return [// Default values
-                [new Uri('http', 'www.berlioz-framework.com'),
-                 ['scheme'    => 'http',
-                  'host'      => 'www.berlioz-framework.com',
-                  'port'      => null,
-                  'path'      => '/',
-                  'query'     => '',
-                  'fragment'  => '',
-                  'userinfo'  => '',
-                  'authority' => 'www.berlioz-framework.com'],
-                 'http://www.berlioz-framework.com/'],
-                // Default password parameter
-                [new Uri('https',
-                         'www.berlioz-framework.com',
-                         8080,
-                         '/path/path/index.php',
-                         'test=test&test2=test2',
-                         'fragmentTest',
-                         'elgigi'),
-                 ['scheme'    => 'https',
-                  'host'      => 'www.berlioz-framework.com',
-                  'port'      => 8080,
-                  'path'      => '/path/path/index.php',
-                  'query'     => 'test=test&test2=test2',
-                  'fragment'  => 'fragmentTest',
-                  'userinfo'  => 'elgigi',
-                  'authority' => 'elgigi@www.berlioz-framework.com:8080'],
-                 'https://elgigi@www.berlioz-framework.com:8080/path/path/index.php?test=test&test2=test2#fragmentTest'],
-                // Complete constructor
-                [new Uri('https',
-                         'www.berlioz-framework.com',
-                         8080,
-                         '/path/path/index.php',
-                         'test=test&test2=test2',
-                         'fragmentTest',
-                         'elgigi',
-                         'password'),
-                 ['scheme'    => 'https',
-                  'host'      => 'www.berlioz-framework.com',
-                  'port'      => 8080,
-                  'path'      => '/path/path/index.php',
-                  'query'     => 'test=test&test2=test2',
-                  'fragment'  => 'fragmentTest',
-                  'userinfo'  => 'elgigi:password',
-                  'authority' => 'elgigi:password@www.berlioz-framework.com:8080'],
-                 'https://elgigi:password@www.berlioz-framework.com:8080/path/path/index.php?test=test&test2=test2#fragmentTest']];
+            [
+                new Uri('http', 'www.berlioz-framework.com'),
+                [
+                    'scheme' => 'http',
+                    'host' => 'www.berlioz-framework.com',
+                    'port' => null,
+                    'path' => '/',
+                    'query' => '',
+                    'fragment' => '',
+                    'userinfo' => '',
+                    'authority' => 'www.berlioz-framework.com'
+                ],
+                'http://www.berlioz-framework.com/'
+            ],
+            // Default password parameter
+            [
+                new Uri(
+                    'https',
+                    'www.berlioz-framework.com',
+                    8080,
+                    '/path/path/index.php',
+                    'test=test&test2=test2',
+                    'fragmentTest',
+                    'elgigi'
+                ),
+                [
+                    'scheme' => 'https',
+                    'host' => 'www.berlioz-framework.com',
+                    'port' => 8080,
+                    'path' => '/path/path/index.php',
+                    'query' => 'test=test&test2=test2',
+                    'fragment' => 'fragmentTest',
+                    'userinfo' => 'elgigi',
+                    'authority' => 'elgigi@www.berlioz-framework.com:8080'
+                ],
+                'https://elgigi@www.berlioz-framework.com:8080/path/path/index.php?test=test&test2=test2#fragmentTest'
+            ],
+            // Complete constructor
+            [
+                new Uri(
+                    'https',
+                    'www.berlioz-framework.com',
+                    8080,
+                    '/path/path/index.php',
+                    'test=test&test2=test2',
+                    'fragmentTest',
+                    'elgigi',
+                    'password'
+                ),
+                [
+                    'scheme' => 'https',
+                    'host' => 'www.berlioz-framework.com',
+                    'port' => 8080,
+                    'path' => '/path/path/index.php',
+                    'query' => 'test=test&test2=test2',
+                    'fragment' => 'fragmentTest',
+                    'userinfo' => 'elgigi:password',
+                    'authority' => 'elgigi:password@www.berlioz-framework.com:8080'
+                ],
+                'https://elgigi:password@www.berlioz-framework.com:8080/path/path/index.php?test=test&test2=test2#fragmentTest'
+            ]
+        ];
     }
 
     /**
      * Test constructor and getters.
      *
-     * @param \Berlioz\Http\Message\Uri $uri       Uri
-     * @param array                     $uriValues Values to test
+     * @param \Berlioz\Http\Message\Uri $uri Uri
+     * @param array $uriValues Values to test
      *
      * @dataProvider uriDataProvider
      */
@@ -90,9 +107,9 @@ class UriTest extends TestCase
     /**
      * Test static method "createFromString".
      *
-     * @param \Berlioz\Http\Message\Uri $uri       Uri
-     * @param array                     $uriValues Values to test
-     * @param string                    $stringUri String uri
+     * @param \Berlioz\Http\Message\Uri $uri Uri
+     * @param array $uriValues Values to test
+     * @param string $stringUri String uri
      *
      * @dataProvider uriDataProvider
      */
@@ -103,16 +120,40 @@ class UriTest extends TestCase
         $this->testConstructAndGetters($newUri, $uriValues);
     }
 
+    public function testCreate()
+    {
+        $uri = Uri::createFromString('../qux?foo#bar');
+        $ref = Uri::createFromString('https://elgigi:password@getberlioz.com:8080/doc/#qux');
+
+        $newUri = Uri::create($uri, $ref);
+
+        $this->testConstructAndGetters(
+            $newUri,
+            [
+                'scheme' => 'https',
+                'host' => 'getberlioz.com',
+                'port' => 8080,
+                'path' => '/qux',
+                'query' => 'foo',
+                'fragment' => 'bar',
+                'userinfo' => 'elgigi:password',
+                'authority' => 'elgigi:password@getberlioz.com:8080'
+            ]
+        );
+    }
+
     private function getUriToTest(): Uri
     {
-        return new Uri('http',
-                       'www.berlioz-framework.com',
-                       null,
-                       '/path/path/index.php',
-                       'test=test&test2=test2',
-                       'fragmentTest',
-                       'elgigi',
-                       'password');
+        return new Uri(
+            'http',
+            'www.berlioz-framework.com',
+            null,
+            '/path/path/index.php',
+            'test=test&test2=test2',
+            'fragmentTest',
+            'elgigi',
+            'password'
+        );
     }
 
     public function testWithScheme()
@@ -184,14 +225,14 @@ class UriTest extends TestCase
     /**
      * Test magic method "__toString".
      *
-     * @param \Berlioz\Http\Message\Uri $uri       Uri
-     * @param array                     $uriValues Values to test
-     * @param string                    $stringUri String uri
+     * @param \Berlioz\Http\Message\Uri $uri Uri
+     * @param array $uriValues Values to test
+     * @param string $stringUri String uri
      *
      * @dataProvider uriDataProvider
      */
     public function testToString(Uri $uri, array $uriValues, string $stringUri)
     {
-        $this->assertEquals($stringUri, (string) $uri);
+        $this->assertEquals($stringUri, (string)$uri);
     }
 }
