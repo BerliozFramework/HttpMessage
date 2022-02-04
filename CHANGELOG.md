@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file. This projec
 to [Semantic Versioning] (http://semver.org/). For change log format,
 use [Keep a Changelog] (http://keepachangelog.com/).
 
+## [2.1.1] - 2022-02-04
+
+### Changed
+
+- Default value for property `path` or `Uri` is now empty
+
 ## [2.1.0] - 2021-12-23
 
 ### Added
@@ -51,7 +57,8 @@ No changes were introduced since the previous beta 4 release.
 
 ### Fixed
 
-- `ServerRequest::isAjaxRequest()` compare the lower case value of `X-Requested-With` header instead of sensitive case value
+- `ServerRequest::isAjaxRequest()` compare the lower case value of `X-Requested-With` header instead of sensitive case
+  value
 
 ## [2.0.0-beta1] - 2021-04-14
 

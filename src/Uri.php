@@ -35,10 +35,10 @@ class Uri implements UriInterface
      * @param string|null $password Password of uri
      */
     public function __construct(
-        protected string $scheme,
-        protected string $host,
+        protected string $scheme = '',
+        protected string $host = '',
         protected ?int $port = null,
-        protected string $path = '/',
+        protected string $path = '',
         protected string $query = '',
         protected string $fragment = '',
         protected string $user = '',
@@ -69,7 +69,7 @@ class Uri implements UriInterface
             scheme: $ref->getScheme(),
             host: $ref->getHost(),
             port: $ref->getPort(),
-            path: b_resolve_absolute_path($ref->getPath() ?: '/', $uri->getPath() ?: '/'),
+            path: b_resolve_absolute_path($ref->getPath(), $uri->getPath()),
             query: $uri->getQuery(),
             fragment: $uri->getFragment(),
             user: $userInfo[0] ?? '',
@@ -96,7 +96,7 @@ class Uri implements UriInterface
             scheme: $parsedUrl['scheme'] ?? '',
             host: $parsedUrl['host'] ?? '',
             port: $parsedUrl['port'] ?? null,
-            path: $parsedUrl['path'] ?? '/',
+            path: $parsedUrl['path'] ?? '',
             query: $parsedUrl['query'] ?? '',
             fragment: $parsedUrl['fragment'] ?? '',
             user: $parsedUrl['user'] ?? '',
