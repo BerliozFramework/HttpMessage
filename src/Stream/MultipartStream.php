@@ -44,6 +44,40 @@ class MultipartStream implements StreamInterface
     }
 
     /**
+     * Add elements.
+     *
+     * @param array $elements Elements, example: [fieldName => contents, ...]
+     * @param array $headers
+     *
+     * @return void
+     */
+    public function addElements(array $elements, array $headers = []): void
+    {
+        array_walk($elements, fn($value, $key) => $this->addElement($key, $value, $headers));
+    }
+
+    /**
+     * Add element.
+     *
+     * @param string $fieldName
+     * @param StreamInterface|string|resource|null $contents
+     * @param array $headers
+     *
+     * @return void
+     */
+    public function addElement(
+        string $fieldName,
+        $contents,
+        array $headers = [],
+    ): void {
+        if (!$contents instanceof StreamInterface) {
+            $contents = new MemoryStream($contents);
+        }
+
+        $this->addStream($fieldName, $contents, $headers);
+    }
+
+    /**
      * Add file.
      *
      * @param string $fieldName
@@ -141,13 +175,14 @@ class MultipartStream implements StreamInterface
         }
 
         // Content type
-        if (!isset($headers['content-type'])) {
+        if (!array_key_exists('content-type', $headers)) {
             try {
                 $finfo = new finfo(FILEINFO_MIME);
-                $headers['content-type'] = $finfo->file($filename);
+                $contentType = null !== $filename ? $finfo->file($filename) : $finfo->buffer($stream->getContents());
             } catch (Throwable) {
-                $headers['content-type'] = 'application/octet-stream';
+                $contentType = 'application/octet-stream';
             }
+            $headers['content-type'] = $contentType;
         }
 
         return array_filter($headers, fn($value) => null !== $value);

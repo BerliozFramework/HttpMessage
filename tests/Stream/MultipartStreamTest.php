@@ -27,6 +27,61 @@ class MultipartStreamTest extends TestCase
         );
     }
 
+    public function testAddElements()
+    {
+        $multipart = new MultipartStream();
+        $multipart->addElements([
+            'foo' => 'Content of foo!',
+            'bar' => 'Content of bar!',
+            'baz' => 'Content of baz!',
+        ]);
+
+        $this->assertEquals(
+            "--{$multipart->getBoundary()}" . MultipartStream::EOL .
+            "content-disposition: form-data; name=\"foo\"" . MultipartStream::EOL .
+            "content-length: 15" . MultipartStream::EOL .
+            "content-type: text/plain; charset=us-ascii" . MultipartStream::EOL .
+            MultipartStream::EOL .
+            "Content of foo!" . MultipartStream::EOL .
+            MultipartStream::EOL .
+            "--{$multipart->getBoundary()}" . MultipartStream::EOL .
+            "content-disposition: form-data; name=\"bar\"" . MultipartStream::EOL .
+            "content-length: 15" . MultipartStream::EOL .
+            "content-type: text/plain; charset=us-ascii" . MultipartStream::EOL .
+            MultipartStream::EOL .
+            "Content of bar!" . MultipartStream::EOL .
+            MultipartStream::EOL .
+            "--{$multipart->getBoundary()}" . MultipartStream::EOL .
+            "content-disposition: form-data; name=\"baz\"" . MultipartStream::EOL .
+            "content-length: 15" . MultipartStream::EOL .
+            "content-type: text/plain; charset=us-ascii" . MultipartStream::EOL .
+            MultipartStream::EOL .
+            "Content of baz!" . MultipartStream::EOL .
+            MultipartStream::EOL .
+            "--{$multipart->getBoundary()}--" . MultipartStream::EOL,
+            $multipart->getContents(),
+        );
+        $this->assertEquals(685, $multipart->getSize());
+    }
+
+    public function testAddElement()
+    {
+        $multipart = new MultipartStream();
+        $multipart->addElement('foo', 'Content of foo!');
+
+        $this->assertEquals(
+            "--{$multipart->getBoundary()}" . MultipartStream::EOL .
+            "content-disposition: form-data; name=\"foo\"" . MultipartStream::EOL .
+            "content-length: 15" . MultipartStream::EOL .
+            "content-type: text/plain; charset=us-ascii" . MultipartStream::EOL .
+            MultipartStream::EOL .
+            "Content of foo!" . MultipartStream::EOL .
+            MultipartStream::EOL .
+            "--{$multipart->getBoundary()}--" . MultipartStream::EOL,
+            $multipart->getContents(),
+        );
+    }
+
     public function testAddFile_detectionBase64()
     {
         $multipart = new MultipartStream();

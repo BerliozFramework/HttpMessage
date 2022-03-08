@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Berlioz\Http\Message\Stream;
 
 use Exception;
+use InvalidArgumentException;
 use Psr\Http\Message\StreamInterface;
 use RuntimeException;
 
@@ -46,7 +47,17 @@ abstract class AbstractStream implements StreamInterface
             return;
         }
 
-        $this->write((string)$from);
+        if (is_scalar($from)) {
+            $this->write((string)$from);
+            return;
+        }
+
+        throw new InvalidArgumentException(
+            sprintf(
+                'No supported initial type value of stream: "%s"',
+                get_debug_type($from)
+            )
+        );
     }
 
     /**

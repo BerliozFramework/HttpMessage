@@ -21,10 +21,10 @@ class Base64Stream extends MemoryStream
     /**
      * Base64Stream constructor.
      *
-     * @param StreamInterface|string|resource|null $stream
+     * @param StreamInterface|string|resource|null $contents
      */
     public function __construct(
-        $stream = null,
+        $contents = null,
         array $params = [
             'line-length' => 76,
             'line-break-chars' => "\r\n"
@@ -39,7 +39,7 @@ class Base64Stream extends MemoryStream
             params: $params
         );
 
-        $this->initStream($stream);
+        $this->initStream($contents);
     }
 
     /**
