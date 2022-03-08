@@ -15,6 +15,7 @@ use [Keep a Changelog] (http://keepachangelog.com/).
 ### Changed
 
 - Add type on "default" parameter of `ServerRequest::getQueryParam()` method
+- `MemoryStream` allow StreamInterface or resource in argument type
 
 ## [2.1.1] - 2022-02-04
 

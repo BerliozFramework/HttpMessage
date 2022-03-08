@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Berlioz\Http\Message\Stream;
 
 use Berlioz\Http\Message\Stream;
+use Psr\Http\Message\StreamInterface;
 use RuntimeException;
 
 /**
@@ -25,9 +26,11 @@ class MemoryStream extends Stream
     /**
      * MemoryStream constructor.
      *
+     * @param StreamInterface|resource|string|null $contents
+     *
      * @throws RuntimeException If unable to open memory stream
      */
-    public function __construct(string $contents = null)
+    public function __construct($contents = null)
     {
         if (false === ($fp = fopen('php://memory', 'r+'))) {
             throw new RuntimeException('Unable to open memory stream');
