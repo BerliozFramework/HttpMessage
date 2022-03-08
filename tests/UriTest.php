@@ -188,6 +188,28 @@ class UriTest extends TestCase
         );
     }
 
+    public function testCreate_withAbsoluteLink()
+    {
+        $uri = Uri::createFromString('/foo/bar/baz/qux.html');
+        $ref = Uri::createFromString('https://getberlioz.com/foo/bar/');
+
+        $newUri = Uri::create($uri, $ref);
+
+        $this->testConstructAndGetters(
+            $newUri,
+            [
+                'scheme' => 'https',
+                'host' => 'getberlioz.com',
+                'port' => null,
+                'path' => '/foo/bar/baz/qux.html',
+                'query' => '',
+                'fragment' => '',
+                'userinfo' => '',
+                'authority' => 'getberlioz.com'
+            ]
+        );
+    }
+
     public function testCreateEmpty()
     {
         $uri = Uri::createFromString('');
