@@ -6,6 +6,10 @@ use [Keep a Changelog] (http://keepachangelog.com/).
 
 ## [2.2.0] - In progress
 
+### Added
+
+- New `AppendStream` class
+
 ### Changed
 
 - Add type on "default" parameter of `ServerRequest::getQueryParam()` method

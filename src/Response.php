@@ -16,7 +16,6 @@ namespace Berlioz\Http\Message;
 
 use InvalidArgumentException;
 use Psr\Http\Message\ResponseInterface;
-use Psr\Http\Message\StreamInterface;
 
 /**
  * Class Response.
