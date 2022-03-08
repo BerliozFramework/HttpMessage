@@ -35,10 +35,7 @@ class Stream extends AbstractStream
             throw new RuntimeException('Parameter must be a resource type or null value.');
         }
 
+        $fp === null && $fp = fopen('php://temp', 'r+');
         $this->fp = $fp;
-
-        if (null === $fp) {
-            $this->fp = fopen('php://temp', 'r+');
-        }
     }
 }

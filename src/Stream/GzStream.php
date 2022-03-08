@@ -41,11 +41,8 @@ class GzStream extends AbstractStream
             throw new RuntimeException('Parameter must be a resource type or null value.');
         }
 
+        null === $fp && $fp = gzopen('php://temp', 'w');
         $this->fp = $fp;
-
-        if (null === $fp) {
-            $this->fp = gzopen('php://temp', 'w');
-        }
     }
 
     /**

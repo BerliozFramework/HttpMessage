@@ -24,6 +24,32 @@ abstract class AbstractStream implements StreamInterface
     protected $fp;
 
     /**
+     * Init stream.
+     *
+     * @param StreamInterface|resource|string|null $from
+     *
+     * @return void
+     */
+    protected function initStream($from): void
+    {
+        if (null === $from) {
+            return;
+        }
+
+        if (is_resource($from)) {
+            stream_copy_to_stream($from, $this->fp, offset: -1);
+            return;
+        }
+
+        if ($from instanceof StreamInterface) {
+            stream_copy_to_stream($from->detach(), $this->fp, offset: -1);
+            return;
+        }
+
+        $this->write((string)$from);
+    }
+
+    /**
      * Reads all data from the stream into a string, from the beginning to end.
      *
      * This method MUST attempt to seek to the beginning of the stream before

@@ -34,9 +34,6 @@ class MemoryStream extends Stream
         }
 
         parent::__construct($fp);
-
-        if (null !== $contents) {
-            $this->write($contents);
-        }
+        $this->initStream($contents);
     }
 }
