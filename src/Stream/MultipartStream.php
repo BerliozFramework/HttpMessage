@@ -138,7 +138,7 @@ class MultipartStream implements StreamInterface
 
         $this->stream->addStream(new MemoryStream($headersStr));
         $this->stream->addStream($stream);
-        $this->stream->addStream(new MemoryStream(static::EOL . static::EOL));
+        $this->stream->addStream(new MemoryStream(static::EOL));
     }
 
     /**

@@ -43,25 +43,22 @@ class MultipartStreamTest extends TestCase
             "content-type: text/plain; charset=us-ascii" . MultipartStream::EOL .
             MultipartStream::EOL .
             "Content of foo!" . MultipartStream::EOL .
-            MultipartStream::EOL .
             "--{$multipart->getBoundary()}" . MultipartStream::EOL .
             "content-disposition: form-data; name=\"bar\"" . MultipartStream::EOL .
             "content-length: 15" . MultipartStream::EOL .
             "content-type: text/plain; charset=us-ascii" . MultipartStream::EOL .
             MultipartStream::EOL .
             "Content of bar!" . MultipartStream::EOL .
-            MultipartStream::EOL .
             "--{$multipart->getBoundary()}" . MultipartStream::EOL .
             "content-disposition: form-data; name=\"baz\"" . MultipartStream::EOL .
             "content-length: 15" . MultipartStream::EOL .
             "content-type: text/plain; charset=us-ascii" . MultipartStream::EOL .
             MultipartStream::EOL .
             "Content of baz!" . MultipartStream::EOL .
-            MultipartStream::EOL .
             "--{$multipart->getBoundary()}--" . MultipartStream::EOL,
             $multipart->getContents(),
         );
-        $this->assertEquals(685, $multipart->getSize());
+        $this->assertEquals(679, $multipart->getSize());
     }
 
     public function testAddElement()
@@ -76,7 +73,6 @@ class MultipartStreamTest extends TestCase
             "content-type: text/plain; charset=us-ascii" . MultipartStream::EOL .
             MultipartStream::EOL .
             "Content of foo!" . MultipartStream::EOL .
-            MultipartStream::EOL .
             "--{$multipart->getBoundary()}--" . MultipartStream::EOL,
             $multipart->getContents(),
         );
@@ -94,7 +90,6 @@ class MultipartStreamTest extends TestCase
             "content-type: text/plain; charset=us-ascii" . MultipartStream::EOL .
             MultipartStream::EOL .
             "It's a plain text!" . MultipartStream::EOL .
-            MultipartStream::EOL .
             "--{$multipart->getBoundary()}--" . MultipartStream::EOL,
             $multipart->getContents(),
         );
@@ -113,7 +108,6 @@ class MultipartStreamTest extends TestCase
             "content-type: text/plain; charset=us-ascii" . MultipartStream::EOL .
             MultipartStream::EOL .
             "SXQncyBhIHBsYWluIHRleHQh" . MultipartStream::EOL .
-            MultipartStream::EOL .
             "--{$multipart->getBoundary()}--" . MultipartStream::EOL,
             $multipart->getContents(),
         );
@@ -131,7 +125,6 @@ class MultipartStreamTest extends TestCase
             "content-type: text/plain; charset=us-ascii" . MultipartStream::EOL .
             MultipartStream::EOL .
             "It's a plain text!" . MultipartStream::EOL .
-            MultipartStream::EOL .
             "--{$multipart->getBoundary()}--" . MultipartStream::EOL,
             $multipart->getContents(),
         );
@@ -150,7 +143,6 @@ class MultipartStreamTest extends TestCase
             "content-type: application/gzip; charset=binary" . MultipartStream::EOL .
             MultipartStream::EOL .
             "H4sICIFNUF4EAHRlc3QudHh0AAESAO3/SXQncyBhIHBsYWluIHRleHQh1KPs+RIAAAA=" . MultipartStream::EOL .
-            MultipartStream::EOL .
             "--{$multipart->getBoundary()}--" . MultipartStream::EOL,
             $multipart->getContents(),
         );
@@ -169,7 +161,6 @@ class MultipartStreamTest extends TestCase
             "content-type: text/plain; charset=us-ascii" . MultipartStream::EOL .
             MultipartStream::EOL .
             "It's a plain text!" . MultipartStream::EOL .
-            MultipartStream::EOL .
             "--{$multipart->getBoundary()}" . MultipartStream::EOL .
             "content-transfer-encoding: base64" . MultipartStream::EOL .
             "content-disposition: form-data; name=\"my_second_file\"; filename=\"test.txt.gz\"" . MultipartStream::EOL .
@@ -177,7 +168,6 @@ class MultipartStreamTest extends TestCase
             "content-type: application/gzip; charset=binary" . MultipartStream::EOL .
             MultipartStream::EOL .
             "H4sICIFNUF4EAHRlc3QudHh0AAESAO3/SXQncyBhIHBsYWluIHRleHQh1KPs+RIAAAA=" . MultipartStream::EOL .
-            MultipartStream::EOL .
             "--{$multipart->getBoundary()}--" . MultipartStream::EOL,
             $multipart->getContents(),
         );
@@ -203,7 +193,6 @@ class MultipartStreamTest extends TestCase
             "content-type: text/plain; charset=us-ascii" . MultipartStream::EOL .
             MultipartStream::EOL .
             "It's a plain text!" . MultipartStream::EOL .
-            MultipartStream::EOL .
             "--{$multipart->getBoundary()}--" . MultipartStream::EOL,
             $multipart->getContents(),
         );
