@@ -8,6 +8,7 @@ use [Keep a Changelog] (http://keepachangelog.com/).
 
 ### Added
 
+- New `MultipartStream` class
 - New `Base64Stream` class
 - New `AppendStream` class
 
