@@ -138,11 +138,11 @@ class ServerRequest extends Request implements ServerRequestInterface
      * Retrieve query string argument.
      *
      * @param string $name Query param name
-     * @param mixed $default Default value to return if the param does not exist.
+     * @param mixed|null $default Default value to return if the param does not exist.
      *
      * @return mixed
      */
-    public function getQueryParam(string $name, $default = null): mixed
+    public function getQueryParam(string $name, mixed $default = null): mixed
     {
         $queryParams = $this->getQueryParams();
 
