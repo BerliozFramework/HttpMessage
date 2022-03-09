@@ -28,15 +28,13 @@ class Base64StreamTest extends TestCase
     public function test_multipleLine()
     {
         $stream = new Base64Stream(
-            <<<STR
-Sin autem ad adulescentiam perduxissent, dirimi tamen interdum contentione
-vel uxoriae condicionis vel commodi alicuius, quod idem adipisci uterque
-non posset. Quod si qui longius in amicitia provecti essent, tamen saepe
-labefactari, si in honoris contentionem incidissent; pestem enim nullam
-maiorem esse amicitiis quam in plerisque pecuniae cupiditatem, in optimis
-quibusque honoris certamen et gloriae; ex quo inimicitias maximas saepe
-inter amicissimos exstitisse.
-STR
+            "Sin autem ad adulescentiam perduxissent, dirimi tamen interdum contentione\r\n" .
+            "vel uxoriae condicionis vel commodi alicuius, quod idem adipisci uterque\r\n" .
+            "non posset. Quod si qui longius in amicitia provecti essent, tamen saepe\r\n" .
+            "labefactari, si in honoris contentionem incidissent; pestem enim nullam\r\n" .
+            "maiorem esse amicitiis quam in plerisque pecuniae cupiditatem, in optimis\r\n" .
+            "quibusque honoris certamen et gloriae; ex quo inimicitias maximas saepe\r\n" .
+            "inter amicissimos exstitisse."
         );
 
         $this->assertEquals(648, $stream->getSize());
