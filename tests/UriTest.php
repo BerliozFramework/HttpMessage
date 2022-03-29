@@ -254,6 +254,28 @@ class UriTest extends TestCase
         );
     }
 
+    public function testCreate_withoutSchema()
+    {
+        $uri = Uri::createFromString('//getberlioz.com:8080/doc');
+        $ref = Uri::createFromString('https://elgigi:password@gethectororm.com/doc/#qux');
+
+        $newUri = Uri::create($uri, $ref);
+
+        $this->testConstructAndGetters(
+            $newUri,
+            [
+                'scheme' => 'https',
+                'host' => 'getberlioz.com',
+                'port' => 8080,
+                'path' => '/doc',
+                'query' => '',
+                'fragment' => '',
+                'userinfo' => '',
+                'authority' => 'getberlioz.com:8080'
+            ]
+        );
+    }
+
     private function getUriToTest(): Uri
     {
         return new Uri(

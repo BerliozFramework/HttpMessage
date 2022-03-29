@@ -59,6 +59,10 @@ class Uri implements UriInterface
         is_string($uri) && $uri = static::createFromString($uri);
 
         if (!empty($uri->getHost()) || null === $ref) {
+            if (empty($uri->getScheme())) {
+                return $uri->withScheme($ref?->getScheme() ?? '');
+            }
+
             return $uri;
         }
 

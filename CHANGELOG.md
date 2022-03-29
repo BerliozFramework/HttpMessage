@@ -17,6 +17,10 @@ use [Keep a Changelog] (http://keepachangelog.com/).
 - Add type on "default" parameter of `ServerRequest::getQueryParam()` method
 - `MemoryStream` allow StreamInterface or resource in argument type
 
+# Fixed
+
+- `Uri::create()` with empty scheme do not retrieve reference uri scheme
+
 ## [2.1.1] - 2022-02-04
 
 ### Changed
