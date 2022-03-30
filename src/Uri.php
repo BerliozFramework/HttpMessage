@@ -57,6 +57,7 @@ class Uri implements UriInterface
     public static function create(Uri|string $uri, Uri|string|null $ref = null): static
     {
         is_string($uri) && $uri = static::createFromString($uri);
+        is_string($ref) && $ref = static::createFromString($ref);
 
         if (!empty($uri->getHost()) || null === $ref) {
             if (empty($uri->getScheme())) {
@@ -66,7 +67,6 @@ class Uri implements UriInterface
             return $uri;
         }
 
-        is_string($ref) && $ref = static::createFromString($ref);
         $userInfo = explode(':', $ref->getUserInfo(), 2);
 
         return new static(
