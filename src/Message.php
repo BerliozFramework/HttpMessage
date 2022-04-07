@@ -22,11 +22,12 @@ use InvalidArgumentException;
 use Psr\Http\Message\MessageInterface;
 use Psr\Http\Message\StreamInterface;
 use RuntimeException;
+use Stringable;
 
 /**
  * Class Message.
  */
-abstract class Message implements MessageInterface
+abstract class Message implements MessageInterface, Stringable
 {
     protected static array $bodyParser = [
         'application/json' => JsonParser::class,
@@ -325,10 +326,6 @@ abstract class Message implements MessageInterface
      */
     public function getBody(): StreamInterface
     {
-        if (null === $this->body) {
-            $this->body = new Stream();
-        }
-
         return $this->body;
     }
 
@@ -466,5 +463,13 @@ abstract class Message implements MessageInterface
         foreach ((array)$mime as $aMime) {
             static::$bodyParser[$aMime] = $parserClass;
         }
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function __toString(): string
+    {
+        return (string)$this->getBody();
     }
 }

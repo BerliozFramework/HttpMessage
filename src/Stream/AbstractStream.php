@@ -18,8 +18,9 @@ use Exception;
 use InvalidArgumentException;
 use Psr\Http\Message\StreamInterface;
 use RuntimeException;
+use Stringable;
 
-abstract class AbstractStream implements StreamInterface
+abstract class AbstractStream implements StreamInterface, Stringable
 {
     /** @var resource Stream */
     protected $fp;

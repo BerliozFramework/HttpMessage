@@ -16,6 +16,7 @@ use [Keep a Changelog] (http://keepachangelog.com/).
 
 - `Uri` now implement `Stringable` and `JsonSerializable` interfaces
 - `Uri::create()` accept `UriInterface` parameter to convert into `Uri`
+- Stream and message classes now implement `Stringable` interface
 
 ## [2.2.1] - 2022-03-30
 

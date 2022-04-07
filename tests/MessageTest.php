@@ -28,8 +28,7 @@ class MessageTest extends TestCase
 {
     private function newMessageObj()
     {
-        return new
-        class extends Message {
+        return new class extends Message {
             public function __construct()
             {
                 parent::__construct(
@@ -241,5 +240,13 @@ class MessageTest extends TestCase
             'application/json',
             \stdClass::class
         );
+    }
+
+    public function testToString()
+    {
+        $message = $this->newMessageObj();
+        $message = $message->withBody(new Stream\MemoryStream($expected = '{"foo":"bar"}'));
+
+        $this->assertEquals($expected, (string)$message);
     }
 }
