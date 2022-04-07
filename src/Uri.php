@@ -487,6 +487,44 @@ class Uri implements UriInterface, Stringable, JsonSerializable
     }
 
     /**
+     * Return an instance with the added query string.
+     *
+     * @param string $query
+     *
+     * @return static A new instance with the added query string.
+     */
+    public function withAddedQuery(string $query): static
+    {
+        $original = b_parse_str($this->query);
+        $query = b_parse_str($query);
+        $query = array_merge_recursive($original, $query);
+        $query = array_filter($query, fn($value) => null !== $value);
+
+        $clone = clone $this;
+        $clone->query = http_build_query($query);
+
+        return $clone;
+    }
+
+    /**
+     * Return an instance without the specified query string name.
+     *
+     * @param string $name
+     *
+     * @return static A new instance without the specified query string name.
+     */
+    public function withoutQuery(string $name): static
+    {
+        $query = b_parse_str($this->query);
+        unset($query[$name]);
+
+        $clone = clone $this;
+        $clone->query = http_build_query($query);
+
+        return $clone;
+    }
+
+    /**
      * Return an instance with the specified URI fragment.
      *
      * This method MUST retain the state of the current instance, and return

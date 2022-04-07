@@ -6,6 +6,11 @@ use [Keep a Changelog] (http://keepachangelog.com/).
 
 ## [2.3.0] - 2022-04-07
 
+### Added
+
+- New method `Uri::withAddedQuery()` to add query to the existent
+- New method `Uri::withoutQuery()` to remove query string name to the existent
+
 ### Changed
 
 - `Uri` now implement `Stringable` and `JsonSerializable` interfaces

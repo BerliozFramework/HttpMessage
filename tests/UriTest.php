@@ -357,6 +357,31 @@ class UriTest extends TestCase
         $this->assertEquals('', $uri2->getQuery());
     }
 
+    public function testWithAddedQuery()
+    {
+        $uri = $this->getUriToTest();
+        $uri2 = $uri->withAddedQuery('gigi=elgigi');
+
+        $this->assertEquals('test=test&test2=test2', $uri->getQuery());
+        $this->assertEquals('test=test&test2=test2&gigi=elgigi', $uri2->getQuery());
+
+        $uri3 = $uri2->withAddedQuery('gigi[]=elgigi2&gigi[]=elgigi3');
+
+        $this->assertEquals(
+            'test=test&test2=test2&gigi%5B0%5D=elgigi&gigi%5B1%5D=elgigi2&gigi%5B2%5D=elgigi3',
+            $uri3->getQuery()
+        );
+    }
+
+    public function testWithoutQuery()
+    {
+        $uri = $this->getUriToTest();
+        $uri2 = $uri->withoutQuery('test2');
+
+        $this->assertEquals('test=test&test2=test2', $uri->getQuery());
+        $this->assertEquals('test=test', $uri2->getQuery());
+    }
+
     public function testWithFragment()
     {
         $uri = $this->getUriToTest();
