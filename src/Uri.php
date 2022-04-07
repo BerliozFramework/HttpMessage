@@ -56,7 +56,7 @@ class Uri implements UriInterface, Stringable, JsonSerializable
      *
      * @return static
      */
-    public static function create(Uri|string $uri, Uri|string|null $ref = null): static
+    public static function create(UriInterface|string $uri, UriInterface|string|null $ref = null): static
     {
         is_string($uri) && $uri = static::createFromString($uri);
         is_string($ref) && $ref = static::createFromString($ref);
@@ -66,7 +66,23 @@ class Uri implements UriInterface, Stringable, JsonSerializable
                 return $uri->withScheme($ref?->getScheme() ?? '');
             }
 
-            return $uri;
+            if ($uri instanceof static) {
+                return $uri;
+            }
+
+            // Convert any UriInterface into static
+            $userInfo = explode(':', $uri->getUserInfo(), 2);
+
+            return new static(
+                scheme: $uri->getScheme(),
+                host: $uri->getHost(),
+                port: $uri->getPort(),
+                path: $uri->getPath(),
+                query: $uri->getQuery(),
+                fragment: $uri->getFragment(),
+                user: $userInfo[0] ?? '',
+                password: $userInfo[1] ?? '',
+            );
         }
 
         $userInfo = explode(':', $ref->getUserInfo(), 2);

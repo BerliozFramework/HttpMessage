@@ -9,6 +9,7 @@ use [Keep a Changelog] (http://keepachangelog.com/).
 ### Changed
 
 - `Uri` now implement `Stringable` and `JsonSerializable` interfaces
+- `Uri::create()` accept `UriInterface` parameter to convert into `Uri`
 
 ## [2.2.1] - 2022-03-30
 
