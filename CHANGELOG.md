@@ -10,6 +10,7 @@ use [Keep a Changelog] (http://keepachangelog.com/).
 
 - New method `Uri::withAddedQuery()` to add query to the existent
 - New method `Uri::withoutQuery()` to remove query string name to the existent
+- New method `Uri::getQueryValue()` to get query value
 
 ### Changed
 

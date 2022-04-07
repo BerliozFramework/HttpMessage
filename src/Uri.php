@@ -316,6 +316,21 @@ class Uri implements UriInterface, Stringable, JsonSerializable
     }
 
     /**
+     * Get query value in the query string of the URI.
+     *
+     * @param string $name Name of variable
+     * @param mixed $default Default value
+     *
+     * @return mixed Query value in the query string of the URI.
+     */
+    public function getQueryValue(string $name, mixed $default = null): mixed
+    {
+        $query = b_parse_str($this->query);
+
+        return $query[$name] ?? $default;
+    }
+
+    /**
      * Retrieve the fragment component of the URI.
      *
      * If no fragment is present, this method MUST return an empty string.
@@ -587,7 +602,7 @@ class Uri implements UriInterface, Stringable, JsonSerializable
     /**
      * @inheritDoc
      */
-    public function jsonSerialize()
+    public function jsonSerialize(): string
     {
         return (string)$this;
     }

@@ -294,11 +294,20 @@ class UriTest extends TestCase
             'getberlioz.com',
             null,
             '/path/path/index.php',
-            'test=test&test2=test2',
+            'foo=bar&baz=qux',
             'fragmentTest',
             'elgigi',
             'password'
         );
+    }
+
+    public function testGetQueryValue()
+    {
+        $uri = $this->getUriToTest();
+
+        $this->assertEquals('bar', $uri->getQueryValue('foo'));
+        $this->assertNull($uri->getQueryValue('bar'));
+        $this->assertEquals('default', $uri->getQueryValue('bar', 'default'));
     }
 
     public function testWithScheme()
@@ -351,7 +360,7 @@ class UriTest extends TestCase
     {
         $uri = $this->getUriToTest();
         $uri2 = $uri->withQuery('gigi=elgigi');
-        $this->assertEquals('test=test&test2=test2', $uri->getQuery());
+        $this->assertEquals('foo=bar&baz=qux', $uri->getQuery());
         $this->assertEquals('gigi=elgigi', $uri2->getQuery());
         $uri2 = $uri->withQuery('');
         $this->assertEquals('', $uri2->getQuery());
@@ -362,13 +371,13 @@ class UriTest extends TestCase
         $uri = $this->getUriToTest();
         $uri2 = $uri->withAddedQuery('gigi=elgigi');
 
-        $this->assertEquals('test=test&test2=test2', $uri->getQuery());
-        $this->assertEquals('test=test&test2=test2&gigi=elgigi', $uri2->getQuery());
+        $this->assertEquals('foo=bar&baz=qux', $uri->getQuery());
+        $this->assertEquals('foo=bar&baz=qux&gigi=elgigi', $uri2->getQuery());
 
         $uri3 = $uri2->withAddedQuery('gigi[]=elgigi2&gigi[]=elgigi3');
 
         $this->assertEquals(
-            'test=test&test2=test2&gigi%5B0%5D=elgigi&gigi%5B1%5D=elgigi2&gigi%5B2%5D=elgigi3',
+            'foo=bar&baz=qux&gigi%5B0%5D=elgigi&gigi%5B1%5D=elgigi2&gigi%5B2%5D=elgigi3',
             $uri3->getQuery()
         );
     }
@@ -376,10 +385,10 @@ class UriTest extends TestCase
     public function testWithoutQuery()
     {
         $uri = $this->getUriToTest();
-        $uri2 = $uri->withoutQuery('test2');
+        $uri2 = $uri->withoutQuery('baz');
 
-        $this->assertEquals('test=test&test2=test2', $uri->getQuery());
-        $this->assertEquals('test=test', $uri2->getQuery());
+        $this->assertEquals('foo=bar&baz=qux', $uri->getQuery());
+        $this->assertEquals('foo=bar', $uri2->getQuery());
     }
 
     public function testWithFragment()
