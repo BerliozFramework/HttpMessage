@@ -151,6 +151,14 @@ class UriTest extends TestCase
     }
 
     /**
+     * @dataProvider uriDataProvider
+     */
+    public function testJsonSerialize(Uri $uri, array $uriValues, string $expected)
+    {
+        $this->assertEquals(json_encode($expected), json_encode($uri));
+    }
+
+    /**
      * Test static method "createFromString".
      *
      * @param \Berlioz\Http\Message\Uri $uri Uri

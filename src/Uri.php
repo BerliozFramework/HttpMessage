@@ -15,12 +15,14 @@ declare(strict_types=1);
 namespace Berlioz\Http\Message;
 
 use InvalidArgumentException;
+use JsonSerializable;
 use Psr\Http\Message\UriInterface;
+use Stringable;
 
 /**
  * Class Uri.
  */
-class Uri implements UriInterface
+class Uri implements UriInterface, Stringable, JsonSerializable
 {
     /**
      * Uri constructor.
@@ -526,5 +528,13 @@ class Uri implements UriInterface
             $this->getPath() .
             (!empty($query) ? '?' . $query : '') .
             (!empty($fragment) ? '#' . $fragment : '');
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function jsonSerialize()
+    {
+        return (string)$this;
     }
 }

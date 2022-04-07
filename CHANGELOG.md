@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file. This projec
 to [Semantic Versioning] (http://semver.org/). For change log format,
 use [Keep a Changelog] (http://keepachangelog.com/).
 
+## [2.3.0] - 2022-04-07
+
+### Changed
+
+- `Uri` now implement `Stringable` and `JsonSerializable` interfaces
+
 ## [2.2.1] - 2022-03-30
 
 ### Fixed
