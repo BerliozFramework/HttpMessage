@@ -174,6 +174,12 @@ class UriTest extends TestCase
         $this->testConstructAndGetters($newUri, $uriValues);
     }
 
+    public function testCreateFromString_withBlankSpaces()
+    {
+        $uri = Uri::createFromString(' https://getberlioz.com/doc ');
+        $this->assertEquals('https://getberlioz.com/doc', $uri);
+    }
+
     public function testCreate()
     {
         $uri = Uri::createFromString('../qux?foo#bar');
@@ -285,6 +291,12 @@ class UriTest extends TestCase
         $newUri = Uri::create($uri, $refUri);
 
         $this->testConstructAndGetters($newUri, $expected);
+    }
+
+    public function testCreate_withBlankSpaces()
+    {
+        $uri = Uri::create(' https://getberlioz.com/doc ');
+        $this->assertEquals('https://getberlioz.com/doc', $uri);
     }
 
     private function getUriToTest(): Uri

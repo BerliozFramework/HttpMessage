@@ -108,7 +108,7 @@ class Uri implements UriInterface, Stringable, JsonSerializable
      */
     public static function createFromString(string $str): static
     {
-        $parsedUrl = parse_url($str);
+        $parsedUrl = parse_url(trim($str));
 
         if (false === $parsedUrl) {
             throw new InvalidArgumentException('Invalid URI');
