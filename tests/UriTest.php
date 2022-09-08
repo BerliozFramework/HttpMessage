@@ -182,7 +182,7 @@ class UriTest extends TestCase
 
     public function testCreate()
     {
-        $uri = Uri::createFromString('../qux?foo#bar');
+        $uri = Uri::createFromString('../qux?foo&bar=bar value#bar');
         $ref = Uri::createFromString('https://elgigi:password@getberlioz.com:8080/doc/#qux');
 
         $newUri = Uri::create($uri, $ref);
@@ -194,7 +194,7 @@ class UriTest extends TestCase
                 'host' => 'getberlioz.com',
                 'port' => 8080,
                 'path' => '/qux',
-                'query' => 'foo=',
+                'query' => 'foo=&bar=bar+value',
                 'fragment' => 'bar',
                 'userinfo' => 'elgigi:password',
                 'authority' => 'elgigi:password@getberlioz.com:8080'
