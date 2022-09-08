@@ -194,7 +194,7 @@ class UriTest extends TestCase
                 'host' => 'getberlioz.com',
                 'port' => 8080,
                 'path' => '/qux',
-                'query' => 'foo',
+                'query' => 'foo=',
                 'fragment' => 'bar',
                 'userinfo' => 'elgigi:password',
                 'authority' => 'elgigi:password@getberlioz.com:8080'
