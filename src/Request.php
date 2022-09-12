@@ -210,7 +210,8 @@ class Request extends Message implements RequestInterface
 
         if (!$preserveHost || empty($headerHost)) {
             if (!empty($clone->getUri()->getHost())) {
-                $clone->headers['Host'] = [$clone->getUri()->getHost()];
+                $port = $clone->getUri()->getPort();
+                $clone->headers['Host'] = [$clone->getUri()->getHost() . (null !== $port ? ':' . $port : '')];
             }
         }
 

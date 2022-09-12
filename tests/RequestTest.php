@@ -121,5 +121,23 @@ class RequestTest extends TestCase
         $this->assertNotEquals($request, $request2);
         $this->assertEquals($uri, $request->getUri());
         $this->assertEquals($uri2, $request2->getUri());
+        $this->assertEquals(['getberlioz.com'], $request2->getHeader('Host'));
+    }
+
+    public function testWithUri_withPort()
+    {
+        $request = $this->getRequestToTest();
+        $uri = $request->getUri();
+        $uri2 = new Uri(
+            'http',
+            'getberlioz.com:8080',
+            null,
+            '/path/index.php'
+        );
+        $request2 = $request->withUri($uri2);
+        $this->assertNotEquals($request, $request2);
+        $this->assertEquals($uri, $request->getUri());
+        $this->assertEquals($uri2, $request2->getUri());
+        $this->assertEquals(['getberlioz.com:8080'], $request2->getHeader('Host'));
     }
 }
