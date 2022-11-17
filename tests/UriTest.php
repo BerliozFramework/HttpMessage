@@ -103,6 +103,28 @@ class UriTest extends TestCase
                 ],
                 'https://elgigi@getberlioz.com:8080/path/path/index.php?test=test&test2=test2#fragmentTest'
             ],
+            // Fragment '0'
+            [
+                new Uri(
+                    'https',
+                    'getberlioz.com',
+                    8080,
+                    '/',
+                    '',
+                    '0'
+                ),
+                [
+                    'scheme' => 'https',
+                    'host' => 'getberlioz.com',
+                    'port' => 8080,
+                    'path' => '/',
+                    'query' => '',
+                    'fragment' => '0',
+                    'userinfo' => '',
+                    'authority' => 'getberlioz.com:8080'
+                ],
+                'https://getberlioz.com:8080/#0'
+            ],
             // Complete constructor
             [
                 new Uri(

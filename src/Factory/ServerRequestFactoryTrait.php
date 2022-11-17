@@ -70,7 +70,7 @@ trait ServerRequestFactoryTrait
         $serverVars['HTTP_CONTENT_LENGTH'] = $serverVars['HTTP_CONTENT_LENGTH'] ?? $serverVars['CONTENT_LENGTH'] ?? null;
 
         foreach ($serverVars as $name => $value) {
-            if (substr($name, 0, 5) !== 'HTTP_') {
+            if (false === str_starts_with($name, 'HTTP_')) {
                 continue;
             }
 

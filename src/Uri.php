@@ -591,14 +591,21 @@ class Uri implements UriInterface, Stringable, JsonSerializable
     {
         $scheme = $this->getScheme();
         $authority = $this->getAuthority();
+        $path = $this->getPath();
         $query = $this->getQuery();
+        $query = (strlen($query) > 0 ? '?' . $query : '');
         $fragment = $this->getFragment();
+        $fragment = (strlen($fragment) > 0 ? '#' . $fragment : '');
+
+        if (empty($path)) {
+            if (!empty($query) || !empty($fragment)) {
+                $path = '/';
+            }
+        }
 
         return
             (!empty($authority) ? (!empty($scheme) ? $scheme . ':' : '') . '//' . $authority : '') .
-            $this->getPath() .
-            (!empty($query) ? '?' . $query : '') .
-            (!empty($fragment) ? '#' . $fragment : '');
+            $path . $query . $fragment;
     }
 
     /**

@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file. This projec
 to [Semantic Versioning] (http://semver.org/). For change log format,
 use [Keep a Changelog] (http://keepachangelog.com/).
 
+## [2.3.4] - In progress
+
+### Fixed
+
+- Query part with not empty string but consider empty by function `empty()`
+- Fragment part with not empty string but consider empty by function `empty()`
+
 ## [2.3.3] - 2022-09-12
 
 ### Fixed
