@@ -125,6 +125,26 @@ class UriTest extends TestCase
                 ],
                 'https://getberlioz.com:8080/#0'
             ],
+            // User info encoded
+            [
+                new Uri(
+                    'https',
+                    'getberlioz.com',
+                    user: 'el gigi',
+                    password: 'pass word'
+                ),
+                [
+                    'scheme' => 'https',
+                    'host' => 'getberlioz.com',
+                    'port' => null,
+                    'path' => '',
+                    'query' => '',
+                    'fragment' => '',
+                    'userinfo' => 'el%20gigi:pass%20word',
+                    'authority' => 'el%20gigi:pass%20word@getberlioz.com'
+                ],
+                'https://el%20gigi:pass%20word@getberlioz.com'
+            ],
             // Complete constructor
             [
                 new Uri(
@@ -216,7 +236,7 @@ class UriTest extends TestCase
                 'host' => 'getberlioz.com',
                 'port' => 8080,
                 'path' => '/qux',
-                'query' => 'foo=&bar=bar+value',
+                'query' => 'foo=&bar=bar%20value',
                 'fragment' => 'bar',
                 'userinfo' => 'elgigi:password',
                 'authority' => 'elgigi:password@getberlioz.com:8080'

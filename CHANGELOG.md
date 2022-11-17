@@ -10,6 +10,8 @@ use [Keep a Changelog] (http://keepachangelog.com/).
 
 - Query part with not empty string but consider empty by function `empty()`
 - Fragment part with not empty string but consider empty by function `empty()`
+- Query not encoded with RF3986
+- User infos not encoded
 
 ## [2.3.3] - 2022-09-12
 

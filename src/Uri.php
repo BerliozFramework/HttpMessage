@@ -84,8 +84,8 @@ class Uri implements UriInterface, Stringable, JsonSerializable
                 path: $uri->getPath(),
                 query: $uri->getQuery(),
                 fragment: $uri->getFragment(),
-                user: $userInfo[0] ?? '',
-                password: $userInfo[1] ?? '',
+                user: rawurldecode($userInfo[0] ?? ''),
+                password: rawurldecode($userInfo[1] ?? ''),
             );
         }
 
@@ -98,8 +98,8 @@ class Uri implements UriInterface, Stringable, JsonSerializable
             path: b_resolve_absolute_path($ref->getPath(), $uri->getPath()),
             query: $uri->getQuery(),
             fragment: $uri->getFragment(),
-            user: $userInfo[0] ?? '',
-            password: $userInfo[1] ?? '',
+            user: rawurldecode($userInfo[0] ?? ''),
+            password: rawurldecode($userInfo[1] ?? ''),
         );
     }
 
@@ -125,8 +125,8 @@ class Uri implements UriInterface, Stringable, JsonSerializable
             path: $parsedUrl['path'] ?? '',
             query: $parsedUrl['query'] ?? '',
             fragment: $parsedUrl['fragment'] ?? '',
-            user: $parsedUrl['user'] ?? '',
-            password: $parsedUrl['pass'] ?? ''
+            user: rawurldecode($parsedUrl['user'] ?? ''),
+            password: rawurldecode($parsedUrl['pass'] ?? '')
         );
     }
 
@@ -206,8 +206,10 @@ class Uri implements UriInterface, Stringable, JsonSerializable
     {
         $userInfo = '';
 
-        if (!empty($this->user)) {
-            $userInfo = $this->user . (false === empty($this->password) ? ':' . $this->password : '');
+        if (strlen($this->user ?? '') > 0) {
+            $userInfo =
+                rawurlencode($this->user) .
+                (strlen($this->password ?? '') > 0 ? ':' . rawurlencode($this->password) : '');
         }
 
         return $userInfo;
@@ -316,7 +318,7 @@ class Uri implements UriInterface, Stringable, JsonSerializable
      */
     public function getQuery(): string
     {
-        return http_build_query($this->query);
+        return http_build_query($this->query, encoding_type: PHP_QUERY_RFC3986);
     }
 
     /**
