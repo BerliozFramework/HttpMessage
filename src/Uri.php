@@ -518,7 +518,7 @@ class Uri implements UriInterface, Stringable, JsonSerializable
         $query = array_filter($query, fn($value) => null !== $value);
 
         $clone = clone $this;
-        $clone->query = http_build_query($query);
+        $clone->query = http_build_query($query, arg_separator: '&', encoding_type: PHP_QUERY_RFC3986);
 
         return $clone;
     }
@@ -536,7 +536,7 @@ class Uri implements UriInterface, Stringable, JsonSerializable
         unset($query[$name]);
 
         $clone = clone $this;
-        $clone->query = http_build_query($query);
+        $clone->query = http_build_query($query, arg_separator: '&', encoding_type: PHP_QUERY_RFC3986);
 
         return $clone;
     }
