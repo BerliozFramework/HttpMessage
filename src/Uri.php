@@ -24,8 +24,6 @@ use Stringable;
  */
 class Uri implements UriInterface, Stringable, JsonSerializable
 {
-    protected array $query = [];
-
     /**
      * Uri constructor.
      *
@@ -43,13 +41,11 @@ class Uri implements UriInterface, Stringable, JsonSerializable
         protected string $host = '',
         protected ?int $port = null,
         protected string $path = '',
-        string $query = '',
+        protected string $query = '',
         protected string $fragment = '',
         protected string $user = '',
         protected ?string $password = null
     ) {
-        // Decode/encode
-        $this->query = b_parse_str($query);
     }
 
     /**
@@ -318,7 +314,7 @@ class Uri implements UriInterface, Stringable, JsonSerializable
      */
     public function getQuery(): string
     {
-        return http_build_query($this->query, encoding_type: PHP_QUERY_RFC3986);
+        return $this->query ?? '';
     }
 
     /**
@@ -331,7 +327,9 @@ class Uri implements UriInterface, Stringable, JsonSerializable
      */
     public function getQueryValue(string $name, mixed $default = null): mixed
     {
-        return $this->query[$name] ?? $default;
+        $query = b_parse_str($this->query);
+
+        return $query[$name] ?? $default;
     }
 
     /**
@@ -500,7 +498,7 @@ class Uri implements UriInterface, Stringable, JsonSerializable
     public function withQuery($query): static
     {
         $clone = clone $this;
-        $clone->query = b_parse_str($query);
+        $clone->query = $query;
 
         return $clone;
     }
@@ -514,13 +512,13 @@ class Uri implements UriInterface, Stringable, JsonSerializable
      */
     public function withAddedQuery(string $query): static
     {
-        $original = $this->query;
+        $original = b_parse_str($this->query);
         $query = b_parse_str($query);
         $query = array_merge_recursive($original, $query);
         $query = array_filter($query, fn($value) => null !== $value);
 
         $clone = clone $this;
-        $clone->query = $query;
+        $clone->query = http_build_query($query);
 
         return $clone;
     }
@@ -534,11 +532,11 @@ class Uri implements UriInterface, Stringable, JsonSerializable
      */
     public function withoutQuery(string $name): static
     {
-        $query = $this->query;
+        $query = b_parse_str($this->query);
         unset($query[$name]);
 
         $clone = clone $this;
-        $clone->query = $query;
+        $clone->query = http_build_query($query);
 
         return $clone;
     }
@@ -605,9 +603,10 @@ class Uri implements UriInterface, Stringable, JsonSerializable
             }
         }
 
-        return
-            (!empty($authority) ? (!empty($scheme) ? $scheme . ':' : '') . '//' . $authority : '') .
+        $uri = (!empty($authority) ? (!empty($scheme) ? $scheme . ':' : '') . '//' . $authority : '') .
             $path . $query . $fragment;
+
+        return strtr($uri, ' ', '+');
     }
 
     /**

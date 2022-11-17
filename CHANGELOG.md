@@ -8,6 +8,7 @@ use [Keep a Changelog] (http://keepachangelog.com/).
 
 ### Fixed
 
+- Revert of version v2.3.2, modify original URL, force replacement of spaces instead of
 - Query part with not empty string but consider empty by function `empty()`
 - Fragment part with not empty string but consider empty by function `empty()`
 - Query not encoded with RF3986

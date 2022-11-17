@@ -175,7 +175,7 @@ class UriTest extends TestCase
     /**
      * Test constructor and getters.
      *
-     * @param \Berlioz\Http\Message\Uri $uri Uri
+     * @param Uri $uri Uri
      * @param array $uriValues Values to test
      *
      * @dataProvider uriDataProvider
@@ -203,7 +203,7 @@ class UriTest extends TestCase
     /**
      * Test static method "createFromString".
      *
-     * @param \Berlioz\Http\Message\Uri $uri Uri
+     * @param Uri $uri Uri
      * @param array $uriValues Values to test
      * @param string $stringUri String uri
      *
@@ -236,11 +236,15 @@ class UriTest extends TestCase
                 'host' => 'getberlioz.com',
                 'port' => 8080,
                 'path' => '/qux',
-                'query' => 'foo=&bar=bar%20value',
+                'query' => 'foo&bar=bar value',
                 'fragment' => 'bar',
                 'userinfo' => 'elgigi:password',
                 'authority' => 'elgigi:password@getberlioz.com:8080'
             ]
+        );
+        $this->assertEquals(
+            'https://elgigi:password@getberlioz.com:8080/qux?foo&bar=bar+value#bar',
+            (string)$newUri
         );
     }
 
@@ -458,7 +462,7 @@ class UriTest extends TestCase
     /**
      * Test magic method "__toString".
      *
-     * @param \Berlioz\Http\Message\Uri $uri Uri
+     * @param Uri $uri Uri
      * @param array $uriValues Values to test
      * @param string $stringUri String uri
      *
