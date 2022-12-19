@@ -21,9 +21,6 @@ use RuntimeException;
  */
 class GzStream extends AbstractStream
 {
-    /** @var resource Stream */
-    protected $fp;
-
     /**
      * Stream constructor.
      *
