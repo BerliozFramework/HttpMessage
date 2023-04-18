@@ -20,6 +20,9 @@ use Berlioz\Http\Message\Parser\JsonParser;
 use Berlioz\Http\Message\Parser\ParserInterface;
 use InvalidArgumentException;
 use Psr\Http\Message\MessageInterface;
+use Psr\Http\Message\RequestInterface;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\StreamInterface;
 use RuntimeException;
 use Stringable;
@@ -420,13 +423,12 @@ abstract class Message implements MessageInterface, Stringable
      * immutability of the message, and MUST return an instance that has the
      * updated body parameters.
      *
-     * @param null|array|object $data The deserialized body data. This will
+     * @param object|array|null $data The deserialized body data. This will
      *                                typically be in an array or object.
      *
-     * @return static
-     * @throws InvalidArgumentException if an unsupported argument type is provided.
+     * @return ServerRequestInterface|static
      */
-    public function withParsedBody($data): static
+    public function withParsedBody($data): ServerRequestInterface|static
     {
         $clone = clone $this;
         $clone->parsedBody = $data;

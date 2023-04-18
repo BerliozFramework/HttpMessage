@@ -342,4 +342,12 @@ class ServerRequest extends Request implements ServerRequestInterface
 
         return false;
     }
+
+    /**
+     * @inheritDoc
+     */
+    public function withParsedBody($data): ServerRequestInterface
+    {
+        return parent::withParsedBody($data);
+    }
 }
