@@ -388,11 +388,11 @@ class Uri implements UriInterface, Stringable, JsonSerializable
      * information.
      *
      * @param string $user The user name to use for authority.
-     * @param null|string $password The password associated with $user.
+     * @param string|null $password The password associated with $user.
      *
      * @return static A new instance with the specified user information.
      */
-    public function withUserInfo($user, $password = null): static
+    public function withUserInfo(string $user, ?string $password = null): static
     {
         $clone = clone $this;
         $clone->user = $user;

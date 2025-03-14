@@ -271,7 +271,7 @@ class ServerRequest extends Request implements ServerRequestInterface
      * @see getAttributes()
      *
      */
-    public function getAttribute($name, $default = null): mixed
+    public function getAttribute(string $name, mixed $default = null): mixed
     {
         return $this->attributes[$name] ?? $default ?? null;
     }

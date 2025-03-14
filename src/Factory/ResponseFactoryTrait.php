@@ -38,7 +38,7 @@ trait ResponseFactoryTrait
      */
     public function createResponse(
         int $code = 200,
-        string $reasonPhrase = null,
+        ?string $reasonPhrase = null,
         array $headers = [],
         mixed $body = null,
         string $protocolVersion = '1.1'

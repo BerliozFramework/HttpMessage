@@ -124,7 +124,7 @@ class AppendStream implements StreamInterface
     /**
      * @inheritDoc
      */
-    public function getMetadata($key = null)
+    public function getMetadata(?string $key = null)
     {
         if (null !== $key) {
             return null;

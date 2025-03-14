@@ -24,7 +24,7 @@ class Base64Stream extends MemoryStream
      * @param StreamInterface|string|resource|null $contents
      */
     public function __construct(
-        $contents = null,
+        mixed $contents = null,
         array $params = [
             'line-length' => 76,
             'line-break-chars' => "\r\n"

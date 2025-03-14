@@ -30,7 +30,7 @@ class MemoryStream extends Stream
      *
      * @throws RuntimeException If unable to open memory stream
      */
-    public function __construct($contents = null)
+    public function __construct(mixed $contents = null)
     {
         if (false === ($fp = fopen('php://memory', 'r+'))) {
             throw new RuntimeException('Unable to open memory stream');

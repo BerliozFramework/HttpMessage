@@ -239,7 +239,7 @@ class MultipartStream implements StreamInterface
     /**
      * @inheritDoc
      */
-    public function getMetadata($key = null): mixed
+    public function getMetadata(?string $key = null): mixed
     {
         return $this->wrapper->getMetadata($key);
     }
