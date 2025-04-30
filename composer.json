@@ -35,7 +35,7 @@
     "ext-zlib": "To use GzStream"
   },
   "provide": {
-    "psr/http-message-implementation": "^1.0",
-    "psr/http-factory-implementation": "^1.0"
+    "psr/http-message-implementation": "*",
+    "psr/http-factory-implementation": "*"
   }
 }
