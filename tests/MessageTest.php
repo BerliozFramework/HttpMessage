@@ -197,7 +197,7 @@ class MessageTest extends TestCase
         $message = $message->withBody($stream)
             ->withHeader('Content-Type', 'application/json');
 
-        $this->assertObjectHasAttribute('json', $message->getParsedBody());
+        $this->assertObjectHasProperty('json', $message->getParsedBody());
     }
 
     public function testWithParsedBody()
