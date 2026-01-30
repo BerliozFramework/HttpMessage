@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Berlioz\Http\Message;
 
+use Berlioz\Http\Message\Factory\UploadedFileFactoryTrait;
 use InvalidArgumentException;
 use Psr\Http\Message\StreamInterface;
 use Psr\Http\Message\UploadedFileInterface;
@@ -33,111 +34,15 @@ class UploadedFile implements UploadedFileInterface
      * @param array $uploadedFiles $_FILES value
      *
      * @return array Multi dimensional \Berlioz\Http\Message\UploadedFile array
+     * @deprecated 2.6.0 Use \Berlioz\Http\Message\Factory\UploadedFileFactoryTrait::createUploadedFiles() instead.
      */
     public static function parseUploadedFiles(array $uploadedFiles): array
     {
-        if (!function_exists(__NAMESPACE__ . '\createUploadedFileObj')) {
-            function createUploadedFileObj(array $array): UploadedFile|array
-            {
-                $result = [];
+        $factory = new class {
+            use UploadedFileFactoryTrait;
+        };
 
-                foreach ($array as $key => $value) {
-                    if (is_array($value)) {
-                        $result[$key] = createUploadedFileObj($value);
-                        continue;
-                    }
-
-                    if ($array['error'] && $array['error'] == 4) {
-                        continue;
-                    }
-
-                    return new UploadedFile(
-                        $array['tmp_name'],
-                        $array['name'] ?: '',
-                        $array['type'] ?: '',
-                        $array['size'] ?: 0,
-                        $array['error'] ?: 0
-                    );
-                }
-
-                return $result;
-            }
-        }
-
-        // Result
-        $normalized = self::sanitizeFileData($uploadedFiles);
-        $result = createUploadedFileObj($normalized);
-        if (is_array($result)) {
-            return $result;
-        }
-
-        return [];
-    }
-
-    /**
-     * Sanitizes the data from $_FILES and returns them as a proper form-input style value, with recursive support.
-     *
-     * @param array $files The $_FILES array to sanitize.
-     *
-     * @return array
-     *
-     * @author Bart Kelsey <http://www.opengameart.org>
-     * @see    https://stackoverflow.com/questions/5444827/how-do-you-loop-through-files-array/29664753#29664753
-     */
-    public static function sanitizeFileData(array $files): array
-    {
-        $result = [];
-
-        foreach ($files as $field => $data) {
-            foreach ($data as $val) {
-                $result[$field] = [];
-
-                if (!is_array($val)) {
-                    $result[$field] = $data;
-                    continue;
-                }
-
-                $res = [];
-                self::filesFlip($res, [], $data);
-                $result[$field] += $res;
-            }
-        }
-
-        return $result;
-    }
-
-    /**
-     * Flips the file's array keys.
-     *
-     * @param array $result
-     * @param array $keys
-     * @param mixed $value
-     *
-     * @author Bart Kelsey <http://www.opengameart.org>
-     * @see    https://stackoverflow.com/questions/5444827/how-do-you-loop-through-files-array/29664753#29664753
-     */
-    public static function filesFlip(array &$result, array $keys, mixed $value): void
-    {
-        if (is_array($value)) {
-            foreach ($value as $k => $v) {
-                $newKeys = $keys;
-                array_push($newKeys, $k);
-                self::filesFlip($result, $newKeys, $v);
-            }
-
-            return;
-        }
-
-        $res = $value;
-        // Move the innermost key to the outer spot
-        $first = array_shift($keys);
-        array_push($keys, $first);
-        foreach (array_reverse($keys) as $k) {
-            // You might think we'd say $res[$k] = $res, but $res starts out not as an array
-            $res = [$k => $res];
-        }
-
-        $result = array_replace_recursive($result, $res);
+        return $factory->createUploadedFiles($uploadedFiles);
     }
 
     /**

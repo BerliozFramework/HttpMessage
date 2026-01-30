@@ -27,6 +27,7 @@ use Psr\Http\Message\UriInterface;
 trait ServerRequestFactoryTrait
 {
     use UriFactoryTrait;
+    use UploadedFileFactoryTrait;
 
     /**
      * Create a new server request.
@@ -139,7 +140,7 @@ trait ServerRequestFactoryTrait
             $_COOKIE,
             $_SERVER,
             new PhpInputStream(),
-            UploadedFile::parseUploadedFiles($_FILES)
+            $this->createUploadedFiles($_FILES)
         );
     }
 }
