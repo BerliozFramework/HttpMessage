@@ -10,6 +10,10 @@ use [Keep a Changelog] (http://keepachangelog.com/).
 
 - Move factory methods for uploaded files to `Factory\UploadedFileFactoryTrait`
 
+### Fixed
+
+- Deprecated function `finfo_close()` since PHP 8.5
+
 ### Deprecated
 
 - `UploadedFile::parseUploadedFiles`, use `Factory\UploadedFileFactoryTrait::createUploadedFiles()` instead

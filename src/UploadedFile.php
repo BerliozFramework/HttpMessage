@@ -249,7 +249,9 @@ class UploadedFile implements UploadedFileInterface
 
         $finfo = finfo_open(FILEINFO_MIME);
         $mime = finfo_file($finfo, $this->file);
-        finfo_close($finfo);
+        if (PHP_VERSION_ID < 80500) {
+            finfo_close($finfo);
+        }
 
         $mime = explode(";", $mime);
 
