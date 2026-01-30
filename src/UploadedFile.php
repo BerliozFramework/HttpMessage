@@ -26,7 +26,6 @@ use RuntimeException;
 class UploadedFile implements UploadedFileInterface
 {
     protected bool $moved = false;
-    private ?StreamInterface $stream = null;
 
     /**
      * Parse uploaded files from $_FILES PHP environment variable
@@ -59,7 +58,8 @@ class UploadedFile implements UploadedFileInterface
         protected ?string $name,
         protected ?string $type,
         protected ?int $size,
-        protected int $error
+        protected int $error,
+        private ?StreamInterface $stream = null,
     ) {
     }
 
@@ -118,6 +118,7 @@ class UploadedFile implements UploadedFileInterface
      * @param StreamInterface $stream
      *
      * @return UploadedFile
+     * @deprecated 2.6.0 Use constructor instead.
      */
     public function setStream(StreamInterface $stream): UploadedFile
     {

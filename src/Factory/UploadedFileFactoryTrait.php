@@ -53,10 +53,14 @@ trait UploadedFileFactoryTrait
             $size = $stream->getSize();
         }
 
-        $uploadedFile = new UploadedFile($filename, $clientFilename, $clientMediaType, $size, $error);
-        $uploadedFile->setStream($stream);
-
-        return $uploadedFile;
+        return new UploadedFile(
+            $filename,
+            $clientFilename,
+            $clientMediaType,
+            $size,
+            $error,
+            $stream,
+        );
     }
 
     /**

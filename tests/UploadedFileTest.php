@@ -105,17 +105,16 @@ class UploadedFileTest extends TestCase
         $this->assertEquals(filesize($file), $uploadedFile->getStream()->getSize());
     }
 
-    public function testSetStream()
+    public function testGetStream()
     {
         $uploadedFile = new FakeUploadedFile(
             $file = __DIR__ . '/test.txt',
             'test.txt',
             'text/plain',
             123456,
-            UPLOAD_ERR_OK
+            UPLOAD_ERR_OK,
+            $stream = new Stream(fopen($file, 'r+'))
         );
-        $stream = new Stream(fopen($file, 'r+'));
-        $uploadedFile->setStream($stream);
 
         $this->assertSame($uploadedFile->getStream(), $stream);
     }

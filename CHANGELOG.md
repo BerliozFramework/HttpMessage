@@ -17,6 +17,7 @@ use [Keep a Changelog] (http://keepachangelog.com/).
 ### Deprecated
 
 - `UploadedFile::parseUploadedFiles`, use `Factory\UploadedFileFactoryTrait::createUploadedFiles()` instead
+- `UploadedFile::setStream()`, use constructor instead
 
 ## [2.5.0] - 2025-03-14
 
