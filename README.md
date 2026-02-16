@@ -16,7 +16,8 @@
 
 ---
 
-**Berlioz HTTP Message** is a PHP library whose implements PSR-7 (HTTP message interfaces) and PSR-17 (HTTP Factories) standards.
+**Berlioz HTTP Message** is a PHP library whose implements PSR-7 (HTTP message interfaces) and PSR-17 (HTTP Factories)
+standards.
 
 📖 **[Full documentation](https://getberlioz.com/)**
 
