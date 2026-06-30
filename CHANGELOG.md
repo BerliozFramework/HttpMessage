@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Reject CR/LF and invalid characters in header names/values and URI components (CRLF/header injection); HTTP/2 pseudo-headers are still allowed
 - Reject CR/LF and NUL in the `Response` reason phrase (HTTP status-line injection)
+- Create upload target directories with restrictive permissions (`0750`) in `UploadedFile::moveTo()`
 
 ## [3.1.1] - 2026-06-10
 

@@ -159,6 +159,9 @@ class UploadedFile implements UploadedFileInterface
      * @see http://php.net/is_uploaded_file
      * @see http://php.net/move_uploaded_file
      *
+     * The caller is responsible for validating/sanitizing $targetPath (e.g. against path
+     * traversal): per PSR-7 the target path is caller-provided and is not validated here.
+     *
      * @param string $targetPath Path to which to move the uploaded file.
      *
      * @throws InvalidArgumentException if the $targetPath specified is invalid.
@@ -174,7 +177,8 @@ class UploadedFile implements UploadedFileInterface
         $directory = dirname($targetPath);
 
         if (!is_dir($directory)) {
-            if (!mkdir($directory, 0777, true)) {
+            // Restrictive permissions (not world-writable); race-safe if another process creates it.
+            if (!mkdir($directory, 0750, true) && !is_dir($directory)) {
                 throw new RuntimeException(sprintf('Error during directory creation "%s"', $directory));
             }
         }
