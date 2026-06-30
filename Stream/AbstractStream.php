@@ -143,7 +143,7 @@ abstract class AbstractStream implements StreamInterface, Stringable
         }
 
         foreach (['r', 'r+', 'w+', 'a+', 'x+', 'c+'] as $rMode) {
-            if (stripos($mode, $rMode) === 0) {
+            if (stripos((string)$mode, $rMode) === 0) {
                 return true;
             }
         }
@@ -203,11 +203,7 @@ abstract class AbstractStream implements StreamInterface, Stringable
             return $metas;
         }
 
-        if (isset($metas[$key])) {
-            return $metas[$key];
-        }
-
-        return null;
+        return $metas[$key] ?? null;
     }
 
     /**

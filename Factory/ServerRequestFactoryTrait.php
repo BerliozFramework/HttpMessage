@@ -66,11 +66,11 @@ trait ServerRequestFactoryTrait
         $headers = [];
 
         $serverVars = $_SERVER;
-        $serverVars['HTTP_CONTENT_TYPE'] = $serverVars['HTTP_CONTENT_TYPE'] ?? $serverVars['CONTENT_TYPE'] ?? null;
-        $serverVars['HTTP_CONTENT_LENGTH'] = $serverVars['HTTP_CONTENT_LENGTH'] ?? $serverVars['CONTENT_LENGTH'] ?? null;
+        $serverVars['HTTP_CONTENT_TYPE'] ??= $serverVars['CONTENT_TYPE'] ?? null;
+        $serverVars['HTTP_CONTENT_LENGTH'] ??= $serverVars['CONTENT_LENGTH'] ?? null;
 
         foreach ($serverVars as $name => $value) {
-            if (false === str_starts_with($name, 'HTTP_')) {
+            if (false === str_starts_with((string)$name, 'HTTP_')) {
                 continue;
             }
 
@@ -78,7 +78,7 @@ trait ServerRequestFactoryTrait
                 continue;
             }
 
-            $name = str_replace(' ', '-', ucwords(strtolower(str_replace('_', ' ', substr($name, 5)))));
+            $name = str_replace(' ', '-', ucwords(strtolower(str_replace('_', ' ', substr((string)$name, 5)))));
             $headers[$name] = $value;
         }
 
@@ -93,11 +93,11 @@ trait ServerRequestFactoryTrait
     protected function getMethodFromGlobals(): string
     {
         if (!empty($_SERVER['HTTP_X_HTTP_METHOD_OVERRIDE'])) {
-            return strtoupper($_SERVER['HTTP_X_HTTP_METHOD_OVERRIDE']);
+            return strtoupper((string)$_SERVER['HTTP_X_HTTP_METHOD_OVERRIDE']);
         }
 
         if (isset($_SERVER['REQUEST_METHOD'])) {
-            return strtoupper($_SERVER['REQUEST_METHOD']);
+            return strtoupper((string)$_SERVER['REQUEST_METHOD']);
         }
 
         return 'GET';
@@ -113,7 +113,7 @@ trait ServerRequestFactoryTrait
         // Path
         $path = null;
         if (isset($_SERVER['REQUEST_URI'])) {
-            $path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+            $path = parse_url((string)$_SERVER['REQUEST_URI'], PHP_URL_PATH);
         }
 
         // Query string

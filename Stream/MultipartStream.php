@@ -21,7 +21,7 @@ use Throwable;
 class MultipartStream implements StreamInterface
 {
     public const EOL = "\r\n";
-    private AppendStream $wrapper;
+    private readonly AppendStream $wrapper;
     private AppendStream $stream;
 
     public function __construct(private ?string $boundary = null)
@@ -157,7 +157,7 @@ class MultipartStream implements StreamInterface
         array $headers = [],
         ?string $filename = null,
     ): array {
-        $keys = array_map(fn($key) => strtolower($key), array_keys($headers));
+        $keys = array_map(strtolower(...), array_keys($headers));
         $values = array_values($headers);
         $headers = array_combine($keys, $values);
 

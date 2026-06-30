@@ -14,6 +14,12 @@ declare(strict_types=1);
 
 namespace Berlioz\Http\Message;
 
+use Berlioz\Http\Message\Factory\RequestFactoryTrait;
+use Berlioz\Http\Message\Factory\ResponseFactoryTrait;
+use Berlioz\Http\Message\Factory\ServerRequestFactoryTrait;
+use Berlioz\Http\Message\Factory\StreamFactoryTrait;
+use Berlioz\Http\Message\Factory\UploadedFileFactoryTrait;
+use Berlioz\Http\Message\Factory\UriFactoryTrait;
 use Psr\Http\Message as Psr;
 
 /**
@@ -27,10 +33,10 @@ class HttpFactory implements
     Psr\UploadedFileFactoryInterface,
     Psr\UriFactoryInterface
 {
-    use Factory\RequestFactoryTrait;
-    use Factory\ResponseFactoryTrait;
-    use Factory\ServerRequestFactoryTrait;
-    use Factory\StreamFactoryTrait;
-    use Factory\UploadedFileFactoryTrait;
-    use Factory\UriFactoryTrait;
+    use RequestFactoryTrait;
+    use ResponseFactoryTrait;
+    use ServerRequestFactoryTrait;
+    use StreamFactoryTrait;
+    use UploadedFileFactoryTrait;
+    use UriFactoryTrait;
 }

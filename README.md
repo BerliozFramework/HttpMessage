@@ -31,4 +31,5 @@ $ composer require berlioz/http-message
 
 ## Documentation
 
-For usage and examples, visit the [official documentation on **getberlioz.com**](https://getberlioz.com/docs/3.x/components/http-message).
+For usage and examples, visit the
+[official documentation on **getberlioz.com**](https://getberlioz.com/docs/3.x/components/http-message).
