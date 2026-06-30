@@ -213,7 +213,27 @@ class Response extends Message implements ResponseInterface
         array $headers = [],
         protected ?string $reasonPhrase = null
     ) {
+        $this->assertReasonPhrase($reasonPhrase);
+
         parent::__construct($body, $headers);
+    }
+
+    /**
+     * Assert that a reason phrase does not contain CR, LF or NUL characters.
+     *
+     * A reason phrase is emitted verbatim into the HTTP status line, so control
+     * characters would allow status-line / header injection.
+     *
+     * @param string|null $reasonPhrase
+     *
+     * @return void
+     * @throws InvalidArgumentException for an invalid reason phrase.
+     */
+    private function assertReasonPhrase(?string $reasonPhrase): void
+    {
+        if (null !== $reasonPhrase && 1 === preg_match('/[\r\n\0]/', $reasonPhrase)) {
+            throw new InvalidArgumentException('Reason phrase must not contain CR, LF or NUL characters');
+        }
     }
 
     /**
@@ -253,6 +273,8 @@ class Response extends Message implements ResponseInterface
      */
     public function withStatus($code, $reasonPhrase = ''): static
     {
+        $this->assertReasonPhrase($reasonPhrase);
+
         $clone = clone $this;
         $clone->statusCode = $code;
         $clone->reasonPhrase = $reasonPhrase;
