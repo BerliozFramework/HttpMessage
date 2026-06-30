@@ -261,13 +261,52 @@ abstract class Message implements MessageInterface, Stringable
         $final = [];
 
         foreach ($headers as $name => $value) {
-            $name = ucwords(strtolower($name), ' -_');
-            $final[$name] = (array)$value;
+            $this->assertHeaderName((string)$name);
+            $normalizedName = ucwords(strtolower((string)$name), ' -_');
+
+            $values = [];
+            foreach ((array)$value as $singleValue) {
+                $singleValue = (string)$singleValue;
+                $this->assertHeaderValue($singleValue);
+                $values[] = $singleValue;
+            }
+
+            $final[$normalizedName] = $values;
         }
 
-        array_walk_recursive($final, fn(&$value) => $value = (string)$value);
-
         return $final;
+    }
+
+    /**
+     * Assert that a header name is valid (RFC 7230 token).
+     *
+     * @param string $name
+     *
+     * @return void
+     * @throws InvalidArgumentException for invalid header names.
+     */
+    private function assertHeaderName(string $name): void
+    {
+        // RFC 7230 token, with an optional leading ":" to allow HTTP/2 pseudo-headers
+        // (":method", ":authority", ":scheme", ":path", ":status") e.g. when replaying HAR captures.
+        if (1 !== preg_match('/^:?[!#$%&\'*+\-.^_`|~0-9A-Za-z]+$/', $name)) {
+            throw new InvalidArgumentException(sprintf('"%s" is not a valid header name', $name));
+        }
+    }
+
+    /**
+     * Assert that a header value does not contain CR, LF or NUL characters.
+     *
+     * @param string $value
+     *
+     * @return void
+     * @throws InvalidArgumentException for invalid header values.
+     */
+    private function assertHeaderValue(string $value): void
+    {
+        if (1 === preg_match('/[\r\n\0]/', $value)) {
+            throw new InvalidArgumentException('Header value must not contain CR, LF or NUL characters');
+        }
     }
 
     /**
@@ -290,10 +329,12 @@ abstract class Message implements MessageInterface, Stringable
     public function withAddedHeader($name, $value): static
     {
         $clone = clone $this;
-        $name = ucwords(strtolower($name), ' -_');
-        $value = (array)$value;
-        array_walk_recursive($value, fn(&$value) => $value = (string)$value);
-        $clone->headers[$name] = array_merge($clone->headers[$name] ?? [], (array)$value);
+        $normalized = $this->normalizeHeaders([$name => $value]);
+        $normalizedName = (string)array_key_first($normalized);
+        $clone->headers[$normalizedName] = array_merge(
+            $clone->headers[$normalizedName] ?? [],
+            $normalized[$normalizedName]
+        );
 
         return $clone;
     }

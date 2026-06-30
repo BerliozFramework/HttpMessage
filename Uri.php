@@ -371,6 +371,12 @@ class Uri implements UriInterface, Stringable, JsonSerializable
      */
     public function withScheme($scheme): static
     {
+        $scheme = (string)$scheme;
+
+        if ('' !== $scheme && 1 !== preg_match('/^[a-zA-Z][a-zA-Z0-9+\-.]*$/', $scheme)) {
+            throw new InvalidArgumentException(sprintf('"%s" is not a valid URI scheme', $scheme));
+        }
+
         $clone = clone $this;
         $clone->scheme = $scheme;
 
@@ -416,6 +422,9 @@ class Uri implements UriInterface, Stringable, JsonSerializable
      */
     public function withHost($host): static
     {
+        $host = (string)$host;
+        $this->assertNoControlCharacters($host, 'host');
+
         $clone = clone $this;
         $clone->host = $host;
 
@@ -473,6 +482,9 @@ class Uri implements UriInterface, Stringable, JsonSerializable
      */
     public function withPath($path): static
     {
+        $path = (string)$path;
+        $this->assertNoControlCharacters($path, 'path');
+
         $clone = clone $this;
         $clone->path = $path;
 
@@ -497,10 +509,31 @@ class Uri implements UriInterface, Stringable, JsonSerializable
      */
     public function withQuery($query): static
     {
+        $query = (string)$query;
+        $this->assertNoControlCharacters($query, 'query');
+
         $clone = clone $this;
         $clone->query = $query;
 
         return $clone;
+    }
+
+    /**
+     * Assert that a URI component does not contain CR, LF or NUL characters.
+     *
+     * @param string $value
+     * @param string $component
+     *
+     * @return void
+     * @throws InvalidArgumentException if the component contains control characters.
+     */
+    private function assertNoControlCharacters(string $value, string $component): void
+    {
+        if (1 === preg_match('/[\r\n\0]/', $value)) {
+            throw new InvalidArgumentException(
+                sprintf('URI %s must not contain CR, LF or NUL characters', $component)
+            );
+        }
     }
 
     /**
