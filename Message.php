@@ -422,11 +422,18 @@ abstract class Message implements MessageInterface, Stringable
             return $this->parsedBody;
         }
 
-        $contentType = explode(';', $contentType);
-        $contentType = $contentType[0];
+        // Keep only the media type, dropping any parameters (e.g. "; charset=utf-8").
+        $contentType = trim(explode(';', $contentType)[0]);
         $contentType = explode('/', $contentType, 2);
-        $contentType[1] = explode('+', $contentType[1]);
-        $contentType = $contentType[0] . '/' . $contentType[1][count($contentType[1]) - 1];
+
+        // A well-formed media type is "type/subtype"; bail out on a malformed value without a subtype.
+        if (!isset($contentType[1]) || '' === $contentType[1]) {
+            return $this->parsedBody;
+        }
+
+        // Normalize structured syntax suffixes (e.g. "application/vnd.api+json" -> "application/json").
+        $subtypeParts = explode('+', $contentType[1]);
+        $contentType = $contentType[0] . '/' . $subtypeParts[count($subtypeParts) - 1];
 
         $parsedBody = null;
         if (isset(static::$bodyParser[$contentType])) {
