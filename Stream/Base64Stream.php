@@ -32,7 +32,7 @@ class Base64Stream extends MemoryStream
     ) {
         parent::__construct();
 
-        stream_filter_append(
+        $filter = stream_filter_append(
             $this->fp,
             filter_name: 'convert.base64-encode',
             mode: STREAM_FILTER_WRITE,
@@ -40,6 +40,13 @@ class Base64Stream extends MemoryStream
         );
 
         $this->initStream($contents);
+
+        // Remove the write filter to force it to flush its buffered bytes (final quantum + padding).
+        // Since PHP 8.4/8.5 (php-src GH-22360), the base64-encode filter only emits the trailing
+        // incomplete group on close/removal, so reading without this would truncate the output.
+        if (is_resource($filter)) {
+            stream_filter_remove($filter);
+        }
     }
 
     /**
