@@ -26,7 +26,7 @@ class MultipartStream implements StreamInterface
 
     public function __construct(private ?string $boundary = null)
     {
-        $this->boundary || $this->boundary = b_str_random(70, B_STR_RANDOM_ALPHA | B_STR_RANDOM_NUMERIC);
+        $this->boundary || $this->boundary = bin2hex(random_bytes(35));
 
         $this->wrapper = new AppendStream();
         $this->wrapper->addStream($this->stream = new AppendStream());
