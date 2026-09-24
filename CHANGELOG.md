@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.3.0] - 2026-09-24
+
 ### Changed
 
 - Generate 70-character multipart boundaries directly from `random_bytes()` instead of the generic random-string helper
