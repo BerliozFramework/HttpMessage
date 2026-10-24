@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- `getParsedBody()` no longer parses the body again when its parsed value is falsy (`null`, `[]`), and respects a `null` value set with `withParsedBody()`
+- `JsonParser` returns `null` for an empty body instead of throwing a `RuntimeException`
+
 ## [3.3.1] - 2026-10-16
 
 _No changes in this release._

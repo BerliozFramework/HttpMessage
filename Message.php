@@ -37,6 +37,7 @@ abstract class Message implements MessageInterface, Stringable
     ];
     protected StreamInterface $body;
     protected mixed $parsedBody = null;
+    protected bool $parsedBodyResolved = false;
 
     public function __construct(
         mixed $body,
@@ -390,6 +391,7 @@ abstract class Message implements MessageInterface, Stringable
         $clone = clone $this;
         $clone->body = $body;
         $clone->parsedBody = null;
+        $clone->parsedBodyResolved = false;
 
         return $clone;
     }
@@ -411,7 +413,7 @@ abstract class Message implements MessageInterface, Stringable
      */
     public function getParsedBody(): mixed
     {
-        if ($this->parsedBody) {
+        if ($this->parsedBodyResolved) {
             return $this->parsedBody;
         }
 
@@ -443,6 +445,8 @@ abstract class Message implements MessageInterface, Stringable
         if (null !== $parsedBody && !is_array($parsedBody) && !is_object($parsedBody)) {
             throw new RuntimeException('Parsed body must be an array or an object or must be null.');
         }
+
+        $this->parsedBodyResolved = true;
 
         return $this->parsedBody = $parsedBody;
     }
@@ -478,6 +482,7 @@ abstract class Message implements MessageInterface, Stringable
     {
         $clone = clone $this;
         $clone->parsedBody = $data;
+        $clone->parsedBodyResolved = true;
 
         return $clone;
     }

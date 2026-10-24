@@ -34,9 +34,16 @@ class JsonParser implements ParserInterface
      */
     public static function parseMessageBody(MessageInterface $message): mixed
     {
+        $contents = (string)$message->getBody();
+
+        // An empty body means the absence of body content, not invalid JSON.
+        if ('' === trim($contents)) {
+            return null;
+        }
+
         try {
             return json_decode(
-                (string)$message->getBody(),
+                $contents,
                 depth: self::MAX_DEPTH,
                 flags: JSON_THROW_ON_ERROR,
             );
