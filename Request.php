@@ -35,6 +35,7 @@ class Request extends Message implements RequestInterface
     const HTTP_METHOD_PUT = 'PUT';
     const HTTP_METHOD_PATCH = 'PATCH';
     const HTTP_METHOD_DELETE = 'DELETE';
+    const HTTP_METHOD_QUERY = 'QUERY';
 
     protected UriInterface $uri;
 
