@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Berlioz\Http\Message;
 
+use Berlioz\Http\Message\Exception\MalformedBodyException;
 use Berlioz\Http\Message\Parser\FormDataParser;
 use Berlioz\Http\Message\Parser\FormUrlEncodedParser;
 use Berlioz\Http\Message\Parser\JsonParser;
@@ -22,7 +23,6 @@ use InvalidArgumentException;
 use Psr\Http\Message\MessageInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\StreamInterface;
-use RuntimeException;
 use Stringable;
 
 /**
@@ -410,6 +410,7 @@ abstract class Message implements MessageInterface, Stringable
      *
      * @return mixed The deserialized body parameters, if any.
      *               These will typically be an array or object.
+     * @throws MalformedBodyException If the body cannot be parsed into an array, an object or null.
      */
     public function getParsedBody(): mixed
     {
@@ -439,11 +440,20 @@ abstract class Message implements MessageInterface, Stringable
 
         $parsedBody = null;
         if (isset(static::$bodyParser[$contentType])) {
-            $parsedBody = call_user_func([static::$bodyParser[$contentType], 'parseMessageBody'], $this);
+            try {
+                $parsedBody = call_user_func([static::$bodyParser[$contentType], 'parseMessageBody'], $this);
+            } catch (MalformedBodyException $exception) {
+                // Attach the message for custom parsers that do not set it
+                $exception->getHttpMessage() ?? $exception->setHttpMessage($this);
+                throw $exception;
+            }
         }
 
         if (null !== $parsedBody && !is_array($parsedBody) && !is_object($parsedBody)) {
-            throw new RuntimeException('Parsed body must be an array or an object or must be null.');
+            throw new MalformedBodyException(
+                'Parsed body must be an array or an object or must be null.',
+                httpMessage: $this,
+            );
         }
 
         $this->parsedBodyResolved = true;

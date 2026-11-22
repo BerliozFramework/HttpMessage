@@ -14,8 +14,8 @@ declare(strict_types=1);
 
 namespace Berlioz\Http\Message\Parser;
 
+use Berlioz\Http\Message\Exception\MalformedBodyException;
 use Psr\Http\Message\MessageInterface;
-use RuntimeException;
 
 /**
  * Interface ParserInterface.
@@ -28,7 +28,7 @@ interface ParserInterface
      * @param MessageInterface $message
      *
      * @return mixed
-     * @throws RuntimeException If contents cannot be parsed.
+     * @throws MalformedBodyException If contents cannot be parsed.
      */
     public static function parseMessageBody(MessageInterface $message): mixed;
 }

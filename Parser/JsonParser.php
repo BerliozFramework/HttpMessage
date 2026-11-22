@@ -14,9 +14,9 @@ declare(strict_types=1);
 
 namespace Berlioz\Http\Message\Parser;
 
+use Berlioz\Http\Message\Exception\MalformedBodyException;
 use JsonException;
 use Psr\Http\Message\MessageInterface;
-use RuntimeException;
 
 /**
  * Class JsonParser.
@@ -48,7 +48,11 @@ class JsonParser implements ParserInterface
                 flags: JSON_THROW_ON_ERROR,
             );
         } catch (JsonException $exception) {
-            throw new RuntimeException('Cannot parse JSON contents', previous: $exception);
+            throw new MalformedBodyException(
+                'Cannot parse JSON contents',
+                previous: $exception,
+                httpMessage: $message,
+            );
         }
     }
 }

@@ -10,6 +10,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - `Request::HTTP_METHOD_QUERY` constant (HTTP QUERY method, RFC 10008)
+- `MalformedBodyException` (extends `RuntimeException`), thrown when a message body cannot be parsed into usable data; `getHttpMessage()` returns the message whose body is malformed
+
+### Changed
+
+- `JsonParser` throws `MalformedBodyException` on invalid JSON, and `getParsedBody()` throws it when the parsed body is neither an array, an object nor `null` (e.g. a scalar JSON root); `getParsedBody()` attaches the message to the exception when a parser does not
 
 ## [3.3.2] - 2026-10-25
 
