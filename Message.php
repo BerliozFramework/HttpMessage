@@ -426,7 +426,8 @@ abstract class Message implements MessageInterface, Stringable
         }
 
         // Keep only the media type, dropping any parameters (e.g. "; charset=utf-8").
-        $contentType = trim(explode(';', $contentType)[0]);
+        // Type and subtype are case-insensitive (RFC 9110, section 8.3.1).
+        $contentType = strtolower(trim(explode(';', $contentType)[0]));
         $contentType = explode('/', $contentType, 2);
 
         // A well-formed media type is "type/subtype"; bail out on a malformed value without a subtype.
@@ -524,7 +525,7 @@ abstract class Message implements MessageInterface, Stringable
         }
 
         foreach ((array)$mime as $aMime) {
-            static::$bodyParser[$aMime] = $parserClass;
+            static::$bodyParser[strtolower($aMime)] = $parserClass;
         }
     }
 

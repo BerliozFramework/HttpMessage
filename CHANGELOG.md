@@ -16,6 +16,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - `JsonParser` throws `MalformedBodyException` on invalid JSON, and `getParsedBody()` throws it when the parsed body is neither an array, an object nor `null` (e.g. a scalar JSON root); `getParsedBody()` attaches the message to the exception when a parser does not
 
+### Fixed
+
+- `getParsedBody()` compares the media type case-insensitively (RFC 9110), so bodies sent as e.g. `Application/JSON` are now parsed; `addBodyParser()` registers media types in lowercase
+
 ## [3.3.2] - 2026-10-25
 
 ### Fixed
