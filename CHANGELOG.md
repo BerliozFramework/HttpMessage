@@ -28,6 +28,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `getParsedBody()` compares the media type case-insensitively (RFC 9110), so bodies sent as e.g. `Application/JSON` are now parsed; `addBodyParser()` registers media types in lowercase
 - Header names ending with a line feed are rejected
 
+### Security
+
+- `MultipartStream` validates part framing metadata (GHSA-r8g6-2j96-hjg9): boundaries must follow RFC 2046 (1-70 allowed characters, no trailing space), part header names must be tokens and values must be strings without control characters (except tab), otherwise an `InvalidArgumentException` is thrown before any bytes are appended; default `Content-Disposition` `name` and `filename` parameters are escaped as in HTML forms (`"`, CR and LF percent-encoded), and backslash is percent-encoded (`%5C`) so that receivers applying quoted-pair unescaping, such as PHP, cannot read it as an escape character; `addElements()` adds no element if one of them is invalid
+
 ## [3.3.2] - 2026-10-25
 
 ### Fixed
