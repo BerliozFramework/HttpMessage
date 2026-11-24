@@ -11,14 +11,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - `Request::HTTP_METHOD_QUERY` constant (HTTP QUERY method, RFC 10008)
 - `MalformedBodyException` (extends `RuntimeException`), thrown when a message body cannot be parsed into usable data; `getHttpMessage()` returns the message whose body is malformed
+- `Http1ResponseValidator`, validating the status line and header fields of any PSR-7 response for an HTTP/1
+  emission without side effects (protocol version, status code 100-599, reason phrase, header names and values;
+  pseudo-headers are rejected); it returns an `Http1ResponseHead` (status line, status code, headers)
+- `InvalidResponseException` (extends `InvalidArgumentException`), thrown by `Http1ResponseValidator`
 
 ### Changed
 
 - `JsonParser` throws `MalformedBodyException` on invalid JSON, and `getParsedBody()` throws it when the parsed body is neither an array, an object nor `null` (e.g. a scalar JSON root); `getParsedBody()` attaches the message to the exception when a parser does not
+- Header names are validated with the same RFC 9110 field-name grammar as `Http1ResponseValidator`; pseudo-headers
+  remain accepted (e.g. HAR replay)
+- Leading and trailing spaces and tabs of header values are removed (optional whitespace, RFC 9110)
 
 ### Fixed
 
 - `getParsedBody()` compares the media type case-insensitively (RFC 9110), so bodies sent as e.g. `Application/JSON` are now parsed; `addBodyParser()` registers media types in lowercase
+- Header names ending with a line feed are rejected
 
 ## [3.3.2] - 2026-10-25
 

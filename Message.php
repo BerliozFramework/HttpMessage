@@ -19,6 +19,7 @@ use Berlioz\Http\Message\Parser\FormDataParser;
 use Berlioz\Http\Message\Parser\FormUrlEncodedParser;
 use Berlioz\Http\Message\Parser\JsonParser;
 use Berlioz\Http\Message\Parser\ParserInterface;
+use Berlioz\Http\Message\Validator\HttpFieldGrammar;
 use InvalidArgumentException;
 use Psr\Http\Message\MessageInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -267,7 +268,8 @@ abstract class Message implements MessageInterface, Stringable
 
             $values = [];
             foreach ((array)$value as $singleValue) {
-                $singleValue = (string)$singleValue;
+                // Optional whitespace around the value is not part of it (RFC 9110)
+                $singleValue = trim((string)$singleValue, " \t");
                 $this->assertHeaderValue($singleValue);
                 $values[] = $singleValue;
             }
@@ -279,7 +281,7 @@ abstract class Message implements MessageInterface, Stringable
     }
 
     /**
-     * Assert that a header name is valid (RFC 7230 token).
+     * Assert that a header name is valid (RFC 9110 token or pseudo-header).
      *
      * @param string $name
      *
@@ -288,15 +290,18 @@ abstract class Message implements MessageInterface, Stringable
      */
     private function assertHeaderName(string $name): void
     {
-        // RFC 7230 token, with an optional leading ":" to allow HTTP/2 pseudo-headers
-        // (":method", ":authority", ":scheme", ":path", ":status") e.g. when replaying HAR captures.
-        if (1 !== preg_match('/^:?[!#$%&\'*+\-.^_`|~0-9A-Za-z]+$/', $name)) {
+        // Pseudo-headers (":method", ":authority", ":scheme", ":path", ":status") are allowed,
+        // e.g. when replaying HAR captures; they are rejected at HTTP/1 emission.
+        if (!HttpFieldGrammar::isFieldName($name) && !HttpFieldGrammar::isPseudoFieldName($name)) {
             throw new InvalidArgumentException(sprintf('"%s" is not a valid header name', $name));
         }
     }
 
     /**
      * Assert that a header value does not contain CR, LF or NUL characters.
+     *
+     * Other control characters are accepted, so that received messages remain readable;
+     * they are rejected at HTTP/1 emission.
      *
      * @param string $value
      *
